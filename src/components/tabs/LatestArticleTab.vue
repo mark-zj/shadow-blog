@@ -1,6 +1,11 @@
 <script>
 export default {
-  name: 'LatestArticleTab'
+  name: 'LatestArticleTab',
+  methods: {
+    getAssetsFile(fileName){
+      return new URL(`../../assets/article/${fileName}.jpg`,import.meta.url).href;
+    }
+  },
 }
 </script>
 
@@ -23,9 +28,12 @@ export default {
              cols="4" sm="4" md="12" lg="5" xl="5"
       >
         <div class="article-banner-parent overflow-hidden">
+          <!--
+                @/assets/article/${index}.jpg
+          -->
           <v-img
             class="article-banner"
-            :src="'./src/assets/article/' + index + '.jpg'"
+            :src="getAssetsFile(`${index}`)"
             width="90"
             height="60"
             cover
@@ -50,7 +58,6 @@ export default {
 </template>
 
 <style lang="css" scoped>
-
 
 
 </style>
