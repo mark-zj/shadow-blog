@@ -16,6 +16,9 @@ export default defineConfig({
   base:'/shadow-blog',
   mode:'development',
   publicDir:'public',
+  build:{
+    outDir: "docs"
+  },
   plugins: [
     VueRouter(),
     Layouts(),
