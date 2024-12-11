@@ -1,79 +1,110 @@
-# Vuetify (Default)
+# 影子blog前端项目设计
 
-This is the official scaffolding tool for Vuetify, designed to give you a head start in building your new Vuetify application. It sets up a base template with all the necessary configurations and standard directory structure, enabling you to begin development without the hassle of setting up the project from scratch.
+***遇到你时，我想成为你的影子***
 
-## ❗️ Important Links
+***写在前面***：
 
-- 📄 [Docs](https://vuetifyjs.com/)
-- 🚨 [Issues](https://issues.vuetifyjs.com/)
-- 🏬 [Store](https://store.vuetifyjs.com/)
-- 🎮 [Playground](https://play.vuetifyjs.com/)
-- 💬 [Discord](https://community.vuetifyjs.com)
-
-## 💿 Install
-
-Set up your project using your preferred package manager. Use the corresponding command to install the dependencies:
-
-| Package Manager                                                | Command        |
-|---------------------------------------------------------------|----------------|
-| [yarn](https://yarnpkg.com/getting-started)                   | `yarn install` |
-| [npm](https://docs.npmjs.com/cli/v7/commands/npm-install)     | `npm install`  |
-| [pnpm](https://pnpm.io/installation)                          | `pnpm install` |
-| [bun](https://bun.sh/#getting-started)                        | `bun install`  |
-
-After completing the installation, your environment is ready for Vuetify development.
-
-## ✨ Features
-
-- 🖼️ **Optimized Front-End Stack**: Leverage the latest Vue 3 and Vuetify 3 for a modern, reactive UI development experience. [Vue 3](https://v3.vuejs.org/) | [Vuetify 3](https://vuetifyjs.com/en/)
-- 🗃️ **State Management**: Integrated with [Pinia](https://pinia.vuejs.org/), the intuitive, modular state management solution for Vue.
-- 🚦 **Routing and Layouts**: Utilizes Vue Router for SPA navigation and vite-plugin-vue-layouts for organizing Vue file layouts. [Vue Router](https://router.vuejs.org/) | [vite-plugin-vue-layouts](https://github.com/JohnCampionJr/vite-plugin-vue-layouts)
-- ⚡ **Next-Gen Tooling**: Powered by Vite, experience fast cold starts and instant HMR (Hot Module Replacement). [Vite](https://vitejs.dev/)
-- 🧩 **Automated Component Importing**: Streamline your workflow with unplugin-vue-components, automatically importing components as you use them. [unplugin-vue-components](https://github.com/antfu/unplugin-vue-components)
-
-These features are curated to provide a seamless development experience from setup to deployment, ensuring that your Vuetify application is both powerful and maintainable.
-
-## 💡 Usage
-
-This section covers how to start the development server and build your project for production.
-
-### Starting the Development Server
-
-To start the development server with hot-reload, run the following command. The server will be accessible at [http://localhost:3000](http://localhost:3000):
-
-```bash
-yarn dev
+```text
+怎们说呢？网站的后端应该是用单体架构，就我这个德行还指望我用微服务那一套？哈哈哈，先做出来再说吧！
+最近学个C++和对应的数据结构与算法都学不下来，就想着做个项目，毕竟以前做个项目都做不完，每次都是做一半
+就把文件都删除了...
+可能你会注意到我为什么会起这么一个项目名字，这跟我最近的遭遇还是有点关系的(埋个伏笔)
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+网站基于Vue3和Vuetify开发，使用的ide为Fleet
+---
 
-> Add NODE_OPTIONS='--no-warnings' to suppress the JSON import warnings that happen as part of the Vuetify import mapping. If you are on Node [v21.3.0](https://nodejs.org/en/blog/release/v21.3.0) or higher, you can change this to NODE_OPTIONS='--disable-warning=5401'. If you don't mind the warning, you can remove this from your package.json dev script.
+## 1.需求分析
 
-### Building for Production
+两个问题：
 
-To build your project for production, use:
+1. 首先网站应该是响应式的，这个边写边改。
+2. 后续的功能删减是个问题，这个涉及到具体的代码编写。
+
+网站应该包含如下功能(可以根据这个来排版)：
+
+- shadow blog 网站
+    - 个人选项卡
+        - 文章数量
+        - 标签数量
+        - 分类数量
+        - github链接
+        - QQ链接
+        - Wechat链接
+    - 轮播图
+    - 首页视频
+    - 时间线
+    - 学习
+        - 分类
+            - 编程语言
+            - 框架
+        - 标签：具体到某一个语言或者是哪种框架
+    - 生活
+        - 照片
+        - 视频
+    - 文章展示
+    - 统一搜索框
+        - 热点数据
+        - 排序
+        - 过滤
+    - 主题切换
+        - dark(default)
+        - light
+    - 网站BGM
+    - 文件分享
+    - 链接推荐
+- shadow 后台
+    - 登录
+    - 个人选项卡
+        - 链接更改
+    - 轮播图
+        - 图片更改
+    - 首页视频
+        - 视频更改
+    - 学习
+        - 分类 CRUD
+        - 标签 CRUD
+    - 生活
+        - 照片 CRUD
+        - 视频 CRUD
+    - 热点数据 CRUD
+    - 网站BGM CRUD
+    - 文件网盘 CRUD
+    - 链接推荐 CRUD
+
+---
+
+## 2.目录设计
+
+- 1.使用如下命令初始化
 
 ```bash
-yarn build
+npm create vuetify@latest
 ```
 
-(Repeat for npm, pnpm, and bun with respective commands.)
+- 2.引入vue-router
 
-Once the build process is completed, your application will be ready for deployment in a production environment.
+```bash
+npm install vue-router@4.4.0
+```
 
-## 💪 Support Vuetify Development
+```test
+-src
+	-assets - 静态资源
+	-components - vue组件
+		-common - 公共组件
+		-public - 公开组件
+	-plugins - vue插件
+		- vuetify - 框架
+		- router - 路由
+```
 
-This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library with a comprehensive collection of Vue components. Vuetify is an MIT licensed Open Source project that has been made possible due to the generous contributions by our [sponsors and backers](https://vuetifyjs.com/introduction/sponsors-and-backers/). If you are interested in supporting this project, please consider:
+## 3.系统设计
 
-- [Requesting Enterprise Support](https://support.vuetifyjs.com/)
-- [Sponsoring John on Github](https://github.com/users/johnleider/sponsorship)
-- [Sponsoring Kael on Github](https://github.com/users/kaelwd/sponsorship)
-- [Supporting the team on Open Collective](https://opencollective.com/vuetify)
-- [Becoming a sponsor on Patreon](https://www.patreon.com/vuetify)
-- [Becoming a subscriber on Tidelift](https://tidelift.com/subscription/npm/vuetify)
-- [Making a one-time donation with Paypal](https://paypal.me/vuetify)
+### API设计
 
-## 📑 License
-[MIT](http://opensource.org/licenses/MIT)
+## 网站部署
 
-Copyright (c) 2016-present Vuetify, LLC
+```text
+做了两天太难了
+```
