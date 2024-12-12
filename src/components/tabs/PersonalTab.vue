@@ -4,11 +4,9 @@ export default {
   mounted() {
     this.getAvatar();
   },
-  data() {
-    return {
-      personalInfoLoading: false,
-    }
-  },
+  data:() =>({
+    personalInfoLoading: false,
+  }),
   methods: {
     getAvatar() {
       this.personalInfoLoading = true;
