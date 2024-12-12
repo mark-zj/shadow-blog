@@ -1,6 +1,6 @@
 {
-  "name": "shadow-blog-web",
-  "version": "0.0.0",
+  "name": "shadow-blog",
+  "version": "Beta v0.0.1",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
