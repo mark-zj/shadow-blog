@@ -8,7 +8,7 @@ export default {
     },
   }),
   computed: {
-    getNoticeInfoContent(){
+    getNoticeInfoContent() {
       return this.noticeInfo.content == null ? '暂无' : this.noticeInfo.content;
     }
   },
@@ -45,7 +45,7 @@ export default {
     </template>
     <v-card-item>
       <template #prepend>
-        <v-icon  color="#FF0033" icon="mdi-bullhorn"/>
+        <v-icon color="#FF0033" icon="mdi-bullhorn"/>
       </template>
       <span class="v-card-title font-weight-bold ps-sm-2">公告</span>
     </v-card-item>

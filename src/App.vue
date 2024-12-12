@@ -292,6 +292,12 @@ export default {
       <!--   手机导航结束   -->
     </v-navigation-drawer>
 
+    <!--   工作日志开始 -->
+    <v-navigation-drawer>
+
+    </v-navigation-drawer>
+    <!--  工作日志结束  -->
+
     <!--    主体    -->
     <v-main class="pt-0" id="app-main">
       <router-view v-slot="{ Component }">

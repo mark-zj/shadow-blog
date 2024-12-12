@@ -28,7 +28,7 @@ export default {
 </script>
 <template>
   <v-card
-    class="d-flex flex-column justify-center"
+    class="d-flex flex-column gr-sm-1 gr-md-2 gr-lg-3 gr-xl-8 gr-xxl-11"
     color="transparent"
     elevation="0"
     :loading="openArticleCardLoading"

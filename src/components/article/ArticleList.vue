@@ -81,9 +81,10 @@ export default {
         </v-col>
         <v-col class="pa-0" cols="12" sm="7" md="7" xl="7">
           <v-skeleton-loader
+            class="gr-sm-1 gr-md-2 gr-lg-3 gr-xl-8 gr-xxl-11"
             :loading="articleLoading"
             color="transparent"
-            type="heading ,subtitle,text, text@2, text@3"
+            type="heading ,subtitle,text,text@3,"
           >
             <article-list-card :article="article"/>
           </v-skeleton-loader>

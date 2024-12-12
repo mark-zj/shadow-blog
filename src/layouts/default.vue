@@ -61,7 +61,7 @@ export default {
       <v-row justify="space-evenly">
         <!--  文章列表    -->
         <v-col class="d-flex flex-column"
-               cols="12" sm="12" md="9" lg="9" xl="7" xxl="7"
+               cols="12" sm="12" md="12" lg="9" xl="8" xxl="7"
         >
           <router-view v-slot="{ Component }">
             <keep-alive>
@@ -70,10 +70,10 @@ export default {
           </router-view>
         </v-col>
         <!--     选项卡   tabs    -->
-        <v-col cols="12" sm="12" md="3" lg="3" xl="2" xxl="2">
+        <v-col cols="12" sm="12" md="12" lg="3" xl="3" xxl="2">
           <v-row justify="space-between">
             <!--      个人   personal    -->
-            <v-col cols="12">
+            <v-col cols="12" >
               <personal-tab/>
             </v-col>
             <!--       公告   notice    -->

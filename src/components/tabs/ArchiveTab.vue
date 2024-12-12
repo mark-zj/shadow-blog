@@ -6,10 +6,12 @@ export default {
 
 <template>
   <v-card class="pa-2" color="#121212cc">
-    <v-card-title class="font-weight-bold">
-      <v-icon icon="mdi-zip-box"/>
-      归档
-    </v-card-title>
+    <v-card-item>
+      <template #prepend>
+        <v-icon icon="mdi-zip-box"/>
+      </template>
+      <span class="v-card-title font-weight-bold ps-sm-2">归档</span>
+    </v-card-item>
     <v-card-subtitle>
       <v-divider/>
     </v-card-subtitle>

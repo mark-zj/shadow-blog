@@ -5,14 +5,16 @@ export default {
 </script>
 
 <template>
-  <v-card class="pa-2 pa-md-1" color="#121212cc">
-    <v-card-title class="font-weight-bold">
-      <v-icon color="#33CC99">mdi-bulletin-board</v-icon>
-      网站信息
-    </v-card-title>
-    <v-card-subtitle>
+  <v-card class="pa-2" color="#121212cc">
+    <v-card-item>
+      <template #prepend>
+        <v-icon color="#33CC99" icon="mdi-bulletin-board"/>
+      </template>
+      <span class="v-card-title font-weight-bold ps-sm-2">网站信息</span>
+    </v-card-item>
+    <v-card-item class="pt-0">
       <v-divider/>
-    </v-card-subtitle>
+    </v-card-item>
     <v-card-item class="text-md-subtitle-2" prepend-icon="mdi-run">
       <div class="d-flex justify-space-between">
         <div class="w-40">运行天数</div>

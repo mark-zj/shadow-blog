@@ -11,14 +11,16 @@ export default {
 
 <template>
   <v-card class="pa-2" color="#121212cc">
-    <v-card-title class="font-weight-bold">
-      <v-icon icon="mdi-tag-multiple"/>
-      标签
-    </v-card-title>
-    <v-card-subtitle>
-      <v-divider/>
-    </v-card-subtitle>
     <v-card-item>
+      <template #prepend>
+        <v-icon icon="mdi-tag-multiple"/>
+      </template>
+      <span class="v-card-title font-weight-bold ps-sm-2">标签</span>
+    </v-card-item>
+    <v-card-item class="pt-0">
+      <v-divider/>
+    </v-card-item>
+    <v-card-item class="pt-0">
       <v-chip-group column>
         <v-chip v-for="(item,index) in tags" :key="index"
                 :text="item"
