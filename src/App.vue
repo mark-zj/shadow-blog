@@ -1,12 +1,13 @@
 <script>
 import {useAppStore} from "@/stores/app";
-import {useGoTo} from "vuetify";
+import {version, useGoTo} from "vuetify";
 
 export default {
+  name: "VuetifyApp",
   setup() {
     const goTo = useGoTo();
     const appStore = useAppStore()
-    return {goTo, appStore}
+    return {goTo, version, appStore}
   },
   data: () => ({
     showSearchBox: false,
@@ -311,9 +312,11 @@ export default {
     />
 
     <!--页脚 -->
-    <v-footer color="#121212cc"
-              app
-              absolute
+    <v-footer
+      class="public-transition"
+      color="#121212cc"
+      app
+      absolute
     >
       <v-container class="pa-0 d-flex flex-column justify-center align-center footer-container"
                    height="150"
@@ -328,8 +331,10 @@ export default {
             </div>
             <div class="text-subtitle-2">
               Powered By
-              <v-icon icon="$vuetify"/>
-              <strong>Vuetify</strong>
+              <span class="cursor-pointer" v-tooltip="{text:`v ${version}`,openOnClick:true}">
+                <v-icon icon="$vuetify"/>
+                <strong>Vuetify</strong>
+              </span>
             </div>
           </div>
           <div class="text-subtitle-2">
@@ -353,7 +358,7 @@ export default {
   transition: all 1s ease-in-out;
 }
 
-#app-main{
+#app-main {
   position: relative;
   background-position: center center;
   background-attachment: fixed;
