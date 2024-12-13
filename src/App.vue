@@ -3,7 +3,7 @@ import {useAppStore} from "@/stores/app";
 import {version, useGoTo} from "vuetify";
 
 export default {
-  name: "VuetifyApp",
+  name: "ShadowBlogApp",
   setup() {
     const goTo = useGoTo();
     const appStore = useAppStore()
@@ -53,6 +53,7 @@ export default {
     </v-overlay>
     <!--    大屏幕导航   -->
     <v-app-bar class="px-5"
+               order="0"
                color="#121212cc"
                scroll-behavior="hide"
                :elevation="0">
@@ -231,7 +232,6 @@ export default {
           ></v-avatar>
         </v-col>
       </v-row>
-
       <v-row class="text-center">
         <v-col cols="12" class="py-0 px-10">
           <v-row>
@@ -248,13 +248,11 @@ export default {
           </v-row>
         </v-col>
       </v-row>
-
       <v-row>
         <v-col class="px-10">
           <v-divider class="border-opacity-75" :thickness="2" color="white"></v-divider>
         </v-col>
       </v-row>
-      <!--   手机导航开始   -->
       <v-list v-model:opened="open" nav slim lines class="px-6">
         <v-list-item prepend-icon="mdi-home" title="主页" link to="/"/>
 
@@ -312,14 +310,60 @@ export default {
         <v-list-item prepend-icon="mdi-book-open-page-variant" title="友人帐"/>
         <v-list-item prepend-icon="mdi-information-variant-box" title="自言自语"/>
       </v-list>
-      <!--   手机导航结束   -->
     </v-navigation-drawer>
+    <!--    小屏幕导航结束   -->
 
-    <!--   工作日志开始 -->
-    <v-navigation-drawer>
-
+    <!--   代码提交日志开始 -->
+    <v-navigation-drawer
+      v-model="appStore.showCommitsDrawer"
+      class="slide-y-transition-move"
+      color="#121212cc"
+      order="-1"
+      location="left"
+      width="350"
+      floating
+      temporary
+    >
+      <v-container
+        v-intersect="appStore._getShadowBlogCommits"
+        class="public-transition"
+        height="100%"
+        fluid
+      >
+        <div class="font-weight-bold text-h6">
+          代码提交日志
+        </div>
+        <v-divider class="my-2 border-opacity-75" thickness="2"/>
+        <div class="d-flex flex-column justify-center align-center h-75">
+          <v-progress-circular v-if="appStore.commitsLoading" color="#00adb5" indeterminate />
+          <v-timeline v-else align="center" side="start">
+            <v-timeline-item
+              v-for="(item,index) in appStore.shadowBlogCommits"
+              :key="index" hide-on-leave leave-absolute
+              dot-color="pink"
+              size="small"
+            >
+              <template v-slot:default>
+                <v-card density="compact">
+                  <template #text>
+                    <div>
+                      <div>
+                        {{ item.commit.message }}
+                      </div>
+                      <div class="text-caption opacity-70">{{ item.commit.author.date }}</div>
+                    </div>
+                  </template>
+                </v-card>
+              </template>
+              <template v-slot:opposite>
+                <strong>{{ item.commit.author.name }}</strong>
+              </template>
+            </v-timeline-item>
+          </v-timeline>
+        </div>
+      </v-container>
     </v-navigation-drawer>
-    <!--  工作日志结束  -->
+    <!--  代码提交日志开始  -->
 
     <!--    主体    -->
     <v-main class="pt-0" id="app-main">
@@ -340,7 +384,7 @@ export default {
       appear
     />
 
-    <!--页脚 -->
+    <!--页脚开始 -->
     <v-footer
       class="public-transition"
       color="#121212cc"
@@ -372,7 +416,7 @@ export default {
         </div>
       </v-container>
     </v-footer>
-
+    <!--页脚结束 -->
   </v-app>
 </template>
 
