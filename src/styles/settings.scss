@@ -5,7 +5,8 @@
  */
 
 // https://vuetifyjs.com/features/sass-variables/`
-// @use 'vuetify/settings' with (
-//   //$color-pack: false,
-//
-// );
+ @use 'vuetify/settings' with (
+   //$color-pack: false,
+   $overlay-opacity: .95,
+   $overlay-scrim-background: #121212cc
+ );

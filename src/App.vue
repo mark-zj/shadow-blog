@@ -9,7 +9,15 @@ export default {
     const appStore = useAppStore()
     return {goTo, version, appStore}
   },
+  created() {
+    window.addEventListener('DOMContentLoaded',()=>{
+      setTimeout(()=> {
+        this.dOMContentLoading = false;
+      },5000);
+    })
+  },
   data: () => ({
+    dOMContentLoading: true,
     showSearchBox: false,
     showDrawer: false,
     open: ['pigeonhole'],
@@ -24,11 +32,25 @@ export default {
     },
 
   },
+  destroyed() {
+    window.removeEventListener('DOMContentLoaded');
+  },
 }
 </script>
 
 <template>
   <v-app>
+    <v-overlay
+      :model-value="dOMContentLoading"
+      class="align-center justify-center text-center"
+      persistent
+    >
+      <div>
+        <v-progress-circular color="#00adb5" indeterminate />
+        <span class="pa-5 font-weight-bold text-subtitle-2">正在启动...</span>
+      </div>
+      <p class="pa-5">你好，陌生人 ~</p>
+    </v-overlay>
     <!--    大屏幕导航   -->
     <v-app-bar class="px-5"
                color="#121212cc"

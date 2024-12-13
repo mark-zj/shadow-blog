@@ -28,7 +28,12 @@ export default {
           Shadow <span class="text-md-end font-weight-bold text-decoration-overline">Blog</span>
           <br/>
           <p class="text-body-1 text-end pt-5">
-            <span class="text-subtitle-1 text-capitalize cursor-pointer">💦 beta v0.0.1</span>
+            <span class="text-subtitle-1 text-capitalize cursor-pointer"
+                  @click="appStore.onShowCommitsDrawer"
+                  v-tooltip="{text:'查看更新日志'}"
+            >
+              💦 beta v0.0.1
+            </span>
           </p>
           <h2 class="pt-10 text-subtitle-1 font-weight-bold">
             😎思想有多远，😁宇宙就有多大
