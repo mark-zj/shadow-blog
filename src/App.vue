@@ -190,14 +190,15 @@ export default {
       <!--   顶部导航结束   -->
     </v-app-bar>
 
-    <!--    小屏幕导航   -->
-    <v-navigation-drawer class="hidden-md-and-up"
-                         v-model="showDrawer"
-                         order="-1"
-                         color="#121212"
-                         location="left"
-                         floating
-                         temporary
+    <!--    小屏幕导航开始   -->
+    <v-navigation-drawer
+      v-model="showDrawer"
+      class="hidden-md-and-up slide-y-transition-move"
+      color="#121212cc"
+      order="-1"
+      location="left"
+      floating
+      temporary
     >
       <v-row class="pt-10">
         <v-col class="text-center">
