@@ -88,6 +88,16 @@ npm create vuetify@latest
 npm install vue-router@4.4.0
 ```
 
+- 3.引入pinia
+```bash
+npm install pinia
+```
+
+- 4.引入网络请求工具axios
+```bash
+npm install axios
+```
+
 ```test
 -src
 	-assets - 静态资源

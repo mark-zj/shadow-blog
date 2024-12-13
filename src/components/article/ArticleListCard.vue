@@ -110,7 +110,7 @@ export default {
   color: #00adb5;
 }
 
-.pushpin{
+.pushpin {
   transform: rotate(-15deg);
 }
 
