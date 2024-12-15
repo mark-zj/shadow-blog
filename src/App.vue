@@ -6,8 +6,12 @@ export default {
   name: "ShadowBlogApp",
   setup() {
     const goTo = useGoTo();
-    const appStore = useAppStore()
-    return {goTo, version, appStore}
+    const appStore = useAppStore();
+    return {
+      goTo,
+      version,
+      appStore
+    }
   },
   created() {
     window.addEventListener('DOMContentLoaded', () => {
@@ -20,10 +24,72 @@ export default {
     // console.log(useLayout().getLayoutItem('appbar'))
   },
   data: () => ({
-    dOMContentLoading: true,
     showSearchBox: false,
     showDrawer: false,
-    open: ['pigeonhole'],
+    navItems: [
+      {
+        icon: 'mdi-home',
+        title: '主页',
+        path: '/',
+      },
+      {
+        icon: 'mdi-archive',
+        title: '归档',
+        childNavItems: [
+          {
+            icon: 'mdi-timeline-text',
+            title: '时间轴',
+            path: '/archive/timeline',
+          },
+          {
+            icon: 'mdi-tag',
+            title: '标签',
+            path: '/archive/tag',
+          },
+          {
+            icon: 'mdi-shape',
+            title: '分类',
+            path: '/archive/shape',
+          },
+          {
+            icon: 'mdi-chat',
+            title: '说说',
+            path: '/archive/chat',
+          },
+        ],
+      },
+      {
+        icon: 'mdi-file-cabinet',
+        title: '文件',
+        childNavItems: [
+          {
+            icon: 'mdi-image',
+            title: '相册',
+            path: '/file/image',
+          },
+          {
+            icon: 'mdi-image-multiple',
+            title: '壁纸',
+            path: '/file/image-multiple',
+          },
+          {
+            icon: 'mdi-movie-roll',
+            title: '电影',
+            path: '/file/movie',
+          },
+        ],
+      },
+      {
+        icon: 'mdi-book-open-page-variant',
+        title: '友人帐',
+        path: '/friend',
+      },
+      {
+        icon: 'mdi-information-variant-box',
+        title: '自言自语',
+        path: '/talk'
+      },
+    ],
     items: Array.from({length: 50}, (k, v) => v + 1),
   }),
   methods: {
@@ -33,7 +99,9 @@ export default {
         done('ok')
       }, 1000)
     },
-
+    goToRoute(path) {
+      this.$router.push({path: path});
+    },
   },
   destroyed() {
     window.removeEventListener('DOMContentLoaded');
@@ -58,23 +126,26 @@ export default {
     <!--  app 启动遮罩结束  -->
 
     <!--    大屏幕导航   -->
-    <v-app-bar class="px-5"
-               order="0"
-               color="#121212cc"
-               scroll-behavior="hide"
-               :elevation="0">
+    <v-app-bar
+      class="px-5"
+      order="0"
+      color="#121212cc"
+      scroll-behavior="hide"
+      :elevation="0"
+    >
       <v-app-bar-title v-slot:text>
         <span class="app-bar-title">
           Shadow Blog
         </span>
       </v-app-bar-title>
       <!--       搜索框开始     -->
-      <v-dialog v-model="showSearchBox"
-                transition="dialog-top-transition"
-                opacity=".1"
-                class="dialog-bg-color"
-                content-class="justify-space-evenly"
-                fullscreen
+      <v-dialog
+        v-model="showSearchBox"
+        transition="dialog-top-transition"
+        opacity=".1"
+        class="dialog-bg-color"
+        content-class="justify-space-evenly"
+        fullscreen
       >
         <v-container max-width="500px" fluid>
           <v-row>
@@ -127,93 +198,74 @@ export default {
       <!--       搜索框结束     -->
       <!--   顶部导航开始   -->
       <template v-slot:append>
-        <div class="d-inline-flex">
+        <div class="d-inline-flex align-center">
           <!--     搜索框     -->
-          <div class="app-bar-nav-item" @click="showSearchBox = !showSearchBox">
-            <v-icon class="app-bar-nav-item-icon" icon="mdi-magnify"/>
-            <span class="hidden-sm-and-down app-bar-nav-item-text">搜索</span>
+          <div
+            class="app-bar-nav-item"
+            @click="showSearchBox = !showSearchBox"
+          >
+            <div class="d-inline-flex align-center gc-1">
+              <v-icon size="small" icon="mdi-magnify"/>
+              <span class="hidden-sm-and-down">搜索</span>
+            </div>
           </div>
+          <!--     搜索框     -->
+
+          <!--     小屏幕抽屉开关开始    -->
           <div class="hidden-md-and-up app-bar-nav-item">
-            <v-icon icon="mdi-menu" @click="showDrawer = !showDrawer"/>
+            <div class="d-inline-flex align-center gc-1">
+              <v-icon icon="mdi-menu" @click="showDrawer = !showDrawer"/>
+            </div>
           </div>
-          <div class="hidden-sm-and-down app-bar-nav-item" @click="this.$router.push({path:'/'})">
-            <v-icon class="app-bar-nav-item-icon" icon="mdi-home"/>
-            <span class="app-bar-nav-item-text">主页</span>
-          </div>
-          <v-menu open-on-hover>
-            <template v-slot:activator="{ props}">
-              <div class="hidden-sm-and-down app-bar-nav-item" v-bind="props">
-                <v-icon class="app-bar-nav-item-icon" icon="mdi-zip-box"/>
-                <span class="app-bar-nav-item-text">归档</span>
-                <v-icon class="pl-1"
-                        :icon="props['aria-expanded'] === 'false' ?'mdi-chevron-up':'mdi-chevron-down'"/>
+          <!--     小屏幕抽屉开关结束     -->
+
+          <!--     大屏幕导航选项开始     -->
+          <template v-for="navItem in navItems">
+            <div
+              v-if="navItem.childNavItems === undefined"
+              class="hidden-sm-and-down"
+              @click="goToRoute(navItem.path)"
+            >
+              <div class="app-bar-nav-item d-inline-flex align-center gc-1">
+                <v-icon size="small" :icon="navItem.icon"/>
+                <span>{{ navItem.title }}</span>
               </div>
-            </template>
-            <v-list nav slim class="pa-0" bg-color="#1212127f">
-              <v-list-item value="1">
-                <template v-slot:prepend>
-                  <v-icon class="v-icon--size-x-small" icon="mdi-timeline-text"/>
-                </template>
-                <v-list-item-title>时间轴</v-list-item-title>
-              </v-list-item>
-              <v-list-item value="2" prepend-icon="mdi-tag">
-                <template v-slot:prepend>
-                  <v-icon class="v-icon--size-x-small" icon="mdi-tag"/>
-                </template>
-                <v-list-item-title>标签</v-list-item-title>
-              </v-list-item>
-              <v-list-item value="3" prepend-icon="mdi-shape">
-                <template v-slot:prepend>
-                  <v-icon class="v-icon--size-x-small" icon="mdi-shape"/>
-                </template>
-                <v-list-item-title>分类</v-list-item-title>
-              </v-list-item>
-              <v-list-item value="4" prepend-icon="mdi-chat">
-                <template v-slot:prepend>
-                  <v-icon class="v-icon--size-x-small" icon="mdi-chat"/>
-                </template>
-                <v-list-item-title>说说</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-          <v-menu open-on-hover>
-            <template v-slot:activator="{ props}">
-              <div class="hidden-sm-and-down app-bar-nav-item" v-bind="props">
-                <v-icon class="app-bar-nav-item-icon" icon="mdi-file-multiple"/>
-                <span class="app-bar-nav-item-text">文件</span>
-                <v-icon class="pl-1"
-                        :icon="props['aria-expanded'] === 'false' ?'mdi-chevron-up':'mdi-chevron-down'"/>
-              </div>
-            </template>
-            <v-list nav slim class="pa-0" bg-color="#1212127f">
-              <v-list-item value="1">
-                <template v-slot:prepend>
-                  <v-icon class="v-icon--size-x-small" icon="mdi-image"/>
-                </template>
-                <v-list-item-title>相册</v-list-item-title>
-              </v-list-item>
-              <v-list-item value="2" prepend-icon="mdi-tag">
-                <template v-slot:prepend>
-                  <v-icon class="v-icon--size-x-small" icon="mdi-image-multiple"/>
-                </template>
-                <v-list-item-title>壁纸</v-list-item-title>
-              </v-list-item>
-              <v-list-item value="3" prepend-icon="mdi-shape">
-                <template v-slot:prepend>
-                  <v-icon class="v-icon--size-x-small" icon="mdi-movie-roll"/>
-                </template>
-                <v-list-item-title>电影</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-          <div class="hidden-sm-and-down app-bar-nav-item">
-            <v-icon class="app-bar-nav-item-icon" icon="mdi-book-open-page-variant"/>
-            <span class="app-bar-nav-item-text">友人帐</span>
-          </div>
-          <div class="hidden-sm-and-down app-bar-nav-item">
-            <v-icon class="app-bar-nav-item-icon" icon="mdi-information-variant-box"/>
-            <span class="app-bar-nav-item-text">自言自语</span>
-          </div>
+            </div>
+            <v-menu
+              v-else
+              open-on-hover
+            >
+              <template v-slot:activator="{props}">
+                <div class="hidden-sm-and-down" v-bind="props">
+                  <div class="app-bar-nav-item d-inline-flex align-center gc-1">
+                    <v-icon size="small" :icon="navItem.icon"/>
+                    <span>{{ navItem.title }}</span>
+                    <v-icon class="pl-1"
+                            :icon="props['aria-expanded'] === 'false' ?'mdi-chevron-up':'mdi-chevron-down'"/>
+                  </div>
+                </div>
+              </template>
+              <v-list
+                class="pa-0"
+                bg-color="#1212127f"
+                color="#00adb5"
+                nav
+                slim
+                lines
+              >
+                <v-list-item
+                  v-for="childNavItem in navItem.childNavItems"
+                  :title="childNavItem.title"
+                  :to="{path: childNavItem.path}"
+                >
+                  <template v-slot:prepend>
+                    <v-icon size="small" :icon="childNavItem.icon"/>
+                  </template>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </template>
+          <!--     大屏幕导航选项结束     -->
         </div>
       </template>
       <!--   顶部导航结束   -->
@@ -229,93 +281,84 @@ export default {
       floating
       temporary
     >
-      <v-row class="pt-10">
-        <v-col class="text-center">
-          <v-avatar image="@/assets/avatar.jpg"
-                    size="90"
-                    border
-                    color="#eeeeee"
-          ></v-avatar>
-        </v-col>
-      </v-row>
-      <v-row class="text-center">
-        <v-col cols="12" class="py-0 px-10">
-          <v-row>
-            <v-col>文 章</v-col>
-            <v-col>分 类</v-col>
-            <v-col>标 签</v-col>
-          </v-row>
-        </v-col>
-        <v-col cols="12" class="py-0 px-10">
-          <v-row>
-            <v-col>1</v-col>
-            <v-col>2</v-col>
-            <v-col>3</v-col>
-          </v-row>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col class="px-10">
-          <v-divider class="border-opacity-75" :thickness="2" color="white"></v-divider>
-        </v-col>
-      </v-row>
-      <v-list v-model:opened="open" nav slim lines class="px-6">
-        <v-list-item prepend-icon="mdi-home" title="主页" link to="/"/>
-
-        <v-list-group value="pigeonhole">
-          <template v-slot:activator="{ props }">
-            <v-list-item
-              v-bind="props"
-              prepend-icon="mdi-zip-box"
-              title="归档"
+      <v-container fluid>
+        <v-row class="pt-10">
+          <v-col class="text-center">
+            <v-avatar
+              image="@/assets/avatar.jpg"
+              size="90"
+              border
+              color="#eeeeee"
             />
+          </v-col>
+        </v-row>
+        <v-row class="text-center">
+          <v-col cols="12" class="py-0">
+            <v-row>
+              <v-col>文 章</v-col>
+              <v-col>分 类</v-col>
+              <v-col>标 签</v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="12" class="py-0">
+            <v-row>
+              <v-col>1</v-col>
+              <v-col>2</v-col>
+              <v-col>3</v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="">
+            <v-divider class="border-opacity-75" :thickness="2" color="white"></v-divider>
+          </v-col>
+        </v-row>
+        <v-list
+          color="#00adb5"
+          nav
+          slim
+          lines
+        >
+          <v-list-subheader
+            class="text-caption font-weight-bold"
+            title="成为你的影子 ~"
+          />
+          <template v-for="navItem in navItems">
+            <v-list-item
+              v-if="navItem.childNavItems === undefined"
+              :title="navItem.title"
+              :to="navItem.path"
+              :prepend-icon="navItem.icon"
+            />
+            <v-list-group
+              v-else
+              color="#00adb5"
+            >
+              <template v-slot:activator="{ props }">
+                <v-list-item
+                  v-bind="props"
+                  :prepend-icon="navItem.icon"
+                  :title="navItem.title"
+                />
+              </template>
+              <v-list
+                class="pl-5"
+                color="#00adb5"
+                nav
+                slim
+                lines
+              >
+                <v-list-item
+                  v-for="childNavItem in navItem.childNavItems"
+                  :prepend-icon="childNavItem.icon"
+                  :title="childNavItem.title"
+                  :to="childNavItem.path"
+                />
+              </v-list>
+            </v-list-group>
           </template>
-          <v-list class="pl-5" nav slim lines>
-            <v-list-item
-              prepend-icon="mdi-timeline-text"
-              title="时间线"
-            />
-            <v-list-item
-              prepend-icon="mdi-tag"
-              title="标签"
-            />
-            <v-list-item
-              prepend-icon="mdi-shape"
-              title="分类"
-            />
-            <v-list-item
-              prepend-icon="mdi-chat"
-              title="说说"
-            />
-          </v-list>
-        </v-list-group>
-        <v-list-group value="file">
-          <template v-slot:activator="{ props }">
-            <v-list-item
-              v-bind="props"
-              prepend-icon="mdi-file-multiple"
-              title="文件"
-            />
-          </template>
-          <v-list class="pl-5" nav slim lines>
-            <v-list-item
-              prepend-icon="mdi-image"
-              title="相册"
-            />
-            <v-list-item
-              prepend-icon="mdi-image-multiple"
-              title="壁纸"
-            />
-            <v-list-item
-              prepend-icon="mdi-movie-roll"
-              title="电影"
-            />
-          </v-list>
-        </v-list-group>
-
-        <v-list-item prepend-icon="mdi-book-open-page-variant" title="友人帐"/>
-        <v-list-item prepend-icon="mdi-information-variant-box" title="自言自语"/>
-      </v-list>
+        </v-list>
+      </v-container>
     </v-navigation-drawer>
     <!--    小屏幕导航结束   -->
 
@@ -330,46 +373,50 @@ export default {
       floating
       temporary
     >
-      <v-container
-        v-intersect="appStore._getShadowBlogCommits"
-        class="public-transition"
-        height="100%"
-        fluid
-      >
+      <v-container class="pb-0" fluid>
         <div class="font-weight-bold text-h6">
           代码提交日志
         </div>
-        <v-divider class="my-2 border-opacity-75" thickness="2"/>
-        <div class="d-flex flex-column justify-center align-center h-75">
-          <v-progress-circular v-if="appStore.commitsLoading" color="#00adb5" indeterminate />
-          <v-timeline v-else align="center" side="start">
-            <v-timeline-item
-              v-for="(item,index) in appStore.shadowBlogCommits"
-              :key="index" hide-on-leave leave-absolute
-              dot-color="pink"
-              size="small"
-            >
-              <template v-slot:default>
-                <v-card density="compact">
-                  <template #text>
-                    <div>
-                      <div>
-                        {{ item.commit.message }}
-                      </div>
-                      <div class="text-caption opacity-70">{{ item.commit.author.date }}</div>
-                    </div>
-                  </template>
-                </v-card>
-              </template>
-              <template v-slot:opposite>
-                <strong>{{ item.commit.author.name }}</strong>
-              </template>
-            </v-timeline-item>
-          </v-timeline>
+        <v-divider class="my-2 border-opacity-75 w-100" thickness="2"/>
+      </v-container>
+      <v-container
+        v-intersect="appStore._getShadowBlogCommits"
+        fluid
+      >
+        <div v-if="appStore.commitsLoading" class="text-center">
+          <v-progress-circular color="#00adb5" indeterminate/>
         </div>
+        <v-timeline
+          v-else
+          align="center"
+          side="start"
+        >
+          <v-timeline-item
+            v-for="(item,index) in appStore.shadowBlogCommits"
+            :key="index" hide-on-leave leave-absolute
+            dot-color="pink"
+            size="small"
+          >
+            <template v-slot:default>
+              <v-card density="compact">
+                <template #text>
+                  <div>
+                    <div>
+                      {{ item.commit.message }}
+                    </div>
+                    <div class="text-caption opacity-70">{{ item.commit.author.date }}</div>
+                  </div>
+                </template>
+              </v-card>
+            </template>
+            <template v-slot:opposite>
+              <strong>{{ item.commit.author.name }}</strong>
+            </template>
+          </v-timeline-item>
+        </v-timeline>
       </v-container>
     </v-navigation-drawer>
-    <!--  代码提交日志开始  -->
+    <!--  代码提交日志结束  -->
 
     <!--    主体    -->
     <v-main class="pt-0" id="app-main">
@@ -465,10 +512,6 @@ export default {
   padding: 0 10px;
 }
 
-.app-bar-nav-item-icon {
-  padding-right: 10px;
-}
-
 .app-bar-nav-item:after {
   position: absolute;
   bottom: -5px;
@@ -476,7 +519,7 @@ export default {
   width: 0;
   height: 3px;
   content: '';
-  transition: all 0.3s ease-in-out;
+  transition: all .3s ease-in-out;
 }
 
 .app-bar-nav-item:hover::after {
