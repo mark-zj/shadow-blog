@@ -8,8 +8,13 @@ export const useAppStore = defineStore('app', {
     showCommitsDrawer: true,
     commitsLoading: false,
     shadowBlogCommits: [],
+    appLaunchOverlay: true,
+    showBanner: false,
   }),
   actions: {
+    launch(){
+      this.showBanner = true;
+    },
     onShowFab(isIntersecting, entries, observer) {
       // More information about these options
       // is located here: https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API

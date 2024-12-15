@@ -10,11 +10,14 @@ export default {
     return {goTo, version, appStore}
   },
   created() {
-    window.addEventListener('DOMContentLoaded',()=>{
-      setTimeout(()=> {
-        this.dOMContentLoading = false;
-      },5000);
-    })
+    window.addEventListener('DOMContentLoaded', () => {
+      // this.appStore.WelcomeBannerLoad();
+      console.log('App loading...')
+      this.appStore.launch();
+    });
+  },
+  mounted() {
+    // console.log(useLayout().getLayoutItem('appbar'))
   },
   data: () => ({
     dOMContentLoading: true,
@@ -40,17 +43,20 @@ export default {
 
 <template>
   <v-app>
+    <!--  app 启动遮罩开始  -->
     <v-overlay
-      :model-value="dOMContentLoading"
+      :model-value="appStore.appLaunchOverlay"
       class="align-center justify-center text-center"
       persistent
     >
       <div>
-        <v-progress-circular color="#00adb5" indeterminate />
+        <v-progress-circular color="#00adb5" indeterminate/>
         <span class="pa-5 font-weight-bold text-subtitle-2">正在启动...</span>
       </div>
       <p class="pa-5">你好，陌生人 ~</p>
     </v-overlay>
+    <!--  app 启动遮罩结束  -->
+
     <!--    大屏幕导航   -->
     <v-app-bar class="px-5"
                order="0"

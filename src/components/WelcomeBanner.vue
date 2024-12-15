@@ -3,21 +3,34 @@ import {useGoTo} from "vuetify";
 import {useAppStore} from "@/stores/app";
 
 export default {
-  name:"WelcomeBanner",
+  name: "WelcomeBanner",
   setup() {
     const goTo = useGoTo()
     const appStore = useAppStore()
     return {
       goTo, appStore
     }
-  }
+  },
+  methods: {
+    bannerImgLoadstart(value) {
+      console.log(value,'bannerImgLoadstart')
+      // this.appStore.appLaunchOverlay = true
+    },
+    bannerImgLoadend(value) {
+      console.log(value,'bannerImgLoadend')
+      this.appStore.appLaunchOverlay = false
+    }
+  },
 }
 </script>
 
 <template>
   <v-parallax v-intersect="appStore.onShowFab">
     <v-img
-      key="banner-1"
+      v-show="appStore.showBanner"
+      :onLoadstart="bannerImgLoadstart"
+      :onLoad="bannerImgLoadend"
+      class="banner-transition"
       src="@/assets/banner-1.jpg"
       width="100%"
       height="100vh"
@@ -44,17 +57,24 @@ export default {
           <h3>
             遇见你时，可否如影随形...
           </h3>
-          <div class="banner-arrow pt-10"
-               @click="goTo('#goto-target-container',{duration:2000 , offset: 10})">
+          <div
+            class="banner-arrow pt-10"
+            @click="goTo('#goto-target-container',{duration:2000 , offset: 10})">
             <v-icon icon="mdi-arrow-down"/>
           </div>
         </div>
       </div>
     </v-img>
   </v-parallax>
+
 </template>
 
 <style scoped lang="css">
+
+.banner-transition {
+  transition: all 1s;
+}
+
 .banner-arrow {
   text-align: center;
   cursor: pointer;
