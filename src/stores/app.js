@@ -4,16 +4,24 @@ import api from '@/api/index'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
+    appLaunchOverlay: false,
+    showBanner: false,
+    startTransition: false,
+
     showFab: false,
-    showCommitsDrawer: true,
+    showCommitsDrawer: false,
     commitsLoading: false,
     shadowBlogCommits: [],
-    appLaunchOverlay: true,
-    showBanner: false,
   }),
   actions: {
-    launch(){
+    async launch()  {
+      console.log('App Starting...')
+      // 打开遮罩
+      this.appLaunchOverlay = true;
+      // 显示bannerDOM
       this.showBanner = true;
+      // 根据API获取必要数据
+      console.log('App Started ~')
     },
     onShowFab(isIntersecting, entries, observer) {
       // More information about these options
@@ -24,7 +32,7 @@ export const useAppStore = defineStore('app', {
       this.showCommitsDrawer = !this.showCommitsDrawer;
     },
     _getShadowBlogCommits(isIntersecting, entries, observer) {
-      if (this.showCommitsDrawer) {
+      if (this.showCommitsDrawer || isIntersecting) {
         this.commitsLoading = true;
         api.App.getShadowBlogCommits()
           .then(data => {

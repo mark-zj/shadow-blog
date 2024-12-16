@@ -15,13 +15,12 @@ export default {
   },
   created() {
     window.addEventListener('DOMContentLoaded', () => {
-      // this.appStore.WelcomeBannerLoad();
-      console.log('App loading...')
-      this.appStore.launch();
+      this.appStore.launch().then(v => {
+        console.info(v);
+      })
     });
   },
   mounted() {
-    // console.log(useLayout().getLayoutItem('appbar'))
   },
   data: () => ({
     showSearchBox: false,
@@ -65,17 +64,17 @@ export default {
           {
             icon: 'mdi-image',
             title: '相册',
-            path: '/file/image',
+            path: '/',
           },
           {
             icon: 'mdi-image-multiple',
             title: '壁纸',
-            path: '/file/image-multiple',
+            path: '/',
           },
           {
             icon: 'mdi-movie-roll',
             title: '电影',
-            path: '/file/movie',
+            path: '/',
           },
         ],
       },
@@ -92,6 +91,19 @@ export default {
     ],
     items: Array.from({length: 50}, (k, v) => v + 1),
   }),
+  watch: {
+    // 如果appLaunchOverlay消失就可以开始应用动画
+    'appStore.appLaunchOverlay': {
+      immediate: true,
+      handler(newValue, oldValue) {
+        if (!newValue) {
+          setTimeout(()=>{
+            this.appStore.startTransition = true;
+          },1500);
+        }
+      }
+    }
+  },
   methods: {
     load({done}) {
       setTimeout(() => {
@@ -118,7 +130,7 @@ export default {
       persistent
     >
       <div>
-        <v-progress-circular color="#00adb5" indeterminate/>
+        <v-progress-circular color="primary" indeterminate/>
         <span class="pa-5 font-weight-bold text-subtitle-2">正在启动...</span>
       </div>
       <p class="pa-5">你好，陌生人 ~</p>
@@ -131,142 +143,172 @@ export default {
       order="0"
       color="#121212cc"
       scroll-behavior="hide"
-      :elevation="0"
+      elevation="1"
     >
       <v-app-bar-title v-slot:text>
-        <span class="app-bar-title">
-          Shadow Blog
-        </span>
+        <transition name="public-fade">
+          <span
+            v-show="appStore.startTransition"
+            class="app-bar-title"
+          >
+              Shadow Blog
+          </span>
+        </transition>
       </v-app-bar-title>
-      <!--       搜索框开始     -->
-      <v-dialog
-        v-model="showSearchBox"
-        transition="dialog-top-transition"
-        opacity=".1"
-        class="dialog-bg-color"
-        content-class="justify-space-evenly"
-        fullscreen
-      >
-        <v-container max-width="500px" fluid>
-          <v-row>
-            <v-col cols="12" class="d-flex align-center justify-center">
-              <v-text-field variant="solo"
-                            min-width="300px"
-                            max-width="300px"
-                            bg-color="#121212cc"
-                            color="#00adb5"
-                            density="comfortable"
-                            hide-details
-                            hide-spin-buttons
-              >
-                <template v-slot:prepend-inner>
-                  <v-icon icon="mdi-file-find"/>
-                </template>
-                <template v-slot:append-inner>
-                  <v-icon icon="mdi-magnify"/>
-                </template>
-              </v-text-field>
-              <v-btn class="ml-5" @click="showSearchBox = !showSearchBox" icon="mdi-close"
-                     color="#121212cc"/>
-            </v-col>
-            <v-col cols="12">
-              <!--  结果-->
-              <v-sheet class="pa-5" color="#121212cc" border>
-                <div class="v-card-title">
-                  <v-icon icon="mdi-receipt-clock"/>
-                  <span class="font-weight-bold">最近</span>
-                </div>
-                <v-infinite-scroll border
-                                   height="300"
-                                   mode="intersect"
-                                   @load="load"
-                                   color="#00adb5"
-                                   empty-text="没有更多了..."
-                >
-                  <template v-for="(index) in items" :key="index">
-                    <div class="v-list-item">
-                      Item number {{ index }}
-                    </div>
-                  </template>
-                </v-infinite-scroll>
-              </v-sheet>
-            </v-col>
-          </v-row>
-        </v-container>
 
-      </v-dialog>
+      <!--       搜索框开始     -->
+      <v-scale-transition>
+        <template>
+          <v-dialog
+            v-model="showSearchBox"
+            content-class="justify-space-evenly"
+            persistent
+            fullscreen
+          >
+            <v-container
+              max-width="500px"
+              fluid
+            >
+              <v-row>
+                <v-col
+                  class="d-flex align-center justify-center"
+                  cols="12"
+                >
+                  <v-text-field
+                    variant="solo"
+                    min-width="300px"
+                    max-width="300px"
+                    bg-color="#121212cc"
+                    color="primary"
+                    density="comfortable"
+                    hide-details
+                    hide-spin-buttons
+                  >
+                    <template v-slot:prepend-inner>
+                      <v-icon icon="mdi-file-find"/>
+                    </template>
+                    <template v-slot:append-inner>
+                      <v-icon icon="mdi-magnify"/>
+                    </template>
+                  </v-text-field>
+                  <v-btn
+                    @click="showSearchBox = !showSearchBox"
+                    class="ml-5"
+                    icon="mdi-close"
+                    color="#121212cc"
+                  />
+                </v-col>
+                <v-col cols="12">
+                  <!--  结果-->
+                  <v-sheet
+                    class="pa-5 border-opacity-75"
+                    color="#121212cc"
+                    border
+                  >
+                    <div class="v-card-title">
+                      <v-icon icon="mdi-receipt-clock"/>
+                      <span class="font-weight-bold">最近</span>
+                    </div>
+                    <v-infinite-scroll
+                      height="300"
+                      mode="intersect"
+                      @load="load"
+                      color="primary"
+                      empty-text="没有更多了..."
+                      border
+                    >
+                      <template v-for="(index) in items" :key="index">
+                        <div class="v-list-item">
+                          Item number {{ index }}
+                        </div>
+                      </template>
+                    </v-infinite-scroll>
+                  </v-sheet>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-dialog>
+        </template>
+      </v-scale-transition>
       <!--       搜索框结束     -->
+
       <!--   顶部导航开始   -->
       <template v-slot:append>
-        <div class="d-inline-flex align-center">
-          <!--     搜索框     -->
+        <transition name="app-nav">
           <div
-            class="app-bar-nav-item"
-            @click="showSearchBox = !showSearchBox"
+            v-if="appStore.startTransition"
+            class="d-inline-flex align-center"
           >
-            <div class="d-inline-flex align-center gc-1">
-              <v-icon size="small" icon="mdi-magnify"/>
-              <span class="hidden-sm-and-down">搜索</span>
-            </div>
-          </div>
-          <!--     搜索框     -->
-
-          <!--     小屏幕抽屉开关开始    -->
-          <div class="hidden-md-and-up app-bar-nav-item">
-            <div class="d-inline-flex align-center gc-1">
-              <v-icon icon="mdi-menu" @click="showDrawer = !showDrawer"/>
-            </div>
-          </div>
-          <!--     小屏幕抽屉开关结束     -->
-
-          <!--     大屏幕导航选项开始     -->
-          <template v-for="navItem in navItems">
+            <!--     搜索框     -->
             <div
-              v-if="navItem.childNavItems === undefined"
-              class="hidden-sm-and-down"
-              @click="goToRoute(navItem.path)"
+              class="app-bar-nav-item"
+              @click="showSearchBox = !showSearchBox"
             >
-              <div class="app-bar-nav-item d-inline-flex align-center gc-1">
-                <v-icon size="small" :icon="navItem.icon"/>
-                <span>{{ navItem.title }}</span>
+              <div class="d-inline-flex align-center gc-1">
+                <v-icon size="small" icon="mdi-magnify"/>
+                <span class="hidden-sm-and-down">搜索</span>
               </div>
             </div>
-            <v-menu
-              v-else
-              open-on-hover
-            >
-              <template v-slot:activator="{props}">
-                <div class="hidden-sm-and-down" v-bind="props">
-                  <div class="app-bar-nav-item d-inline-flex align-center gc-1">
-                    <v-icon size="small" :icon="navItem.icon"/>
-                    <span>{{ navItem.title }}</span>
-                    <v-icon class="pl-1"
-                            :icon="props['aria-expanded'] === 'false' ?'mdi-chevron-up':'mdi-chevron-down'"/>
-                  </div>
-                </div>
-              </template>
-              <v-list
-                class="pa-0"
-                bg-color="#1212127f"
-                color="#00adb5"
-                nav
-                slim
-                lines
+            <!--     搜索框     -->
+
+            <!--     小屏幕抽屉开关开始    -->
+            <div class="hidden-md-and-up app-bar-nav-item">
+              <div class="d-inline-flex align-center gc-1">
+                <v-icon icon="mdi-menu" @click="showDrawer = !showDrawer"/>
+              </div>
+            </div>
+            <!--     小屏幕抽屉开关结束     -->
+
+            <!--     大屏幕导航选项开始     -->
+            <template v-for="navItem in navItems">
+              <div
+                v-if="navItem.childNavItems === undefined"
+                class="hidden-sm-and-down"
+                @click="goToRoute(navItem.path)"
               >
-                <v-list-item
-                  v-for="childNavItem in navItem.childNavItems"
-                  :title="childNavItem.title"
-                  :to="{path: childNavItem.path}"
+                <div class="app-bar-nav-item d-inline-flex align-center gc-1">
+                  <v-icon size="small" :icon="navItem.icon"/>
+                  <span>{{ navItem.title }}</span>
+                </div>
+              </div>
+              <v-menu
+                v-else
+                open-on-hover
+              >
+                <template v-slot:activator="{props}">
+                  <div class="hidden-sm-and-down" v-bind="props">
+                    <div class="app-bar-nav-item d-inline-flex align-center gc-1">
+                      <v-icon size="small" :icon="navItem.icon"/>
+                      <span>{{ navItem.title }}</span>
+                      <v-icon class="pl-1"
+                              :icon="props['aria-expanded'] === 'false' ?'mdi-chevron-up':'mdi-chevron-down'"/>
+                    </div>
+                  </div>
+                </template>
+                <v-list
+                  class="pa-0"
+                  bg-color="#1212127f"
+                  color="primary"
+                  nav
+                  slim
+                  lines
                 >
-                  <template v-slot:prepend>
-                    <v-icon size="small" :icon="childNavItem.icon"/>
-                  </template>
-                </v-list-item>
-              </v-list>
-            </v-menu>
-          </template>
-          <!--     大屏幕导航选项结束     -->
-        </div>
+                  <v-list-item
+                    v-for="childNavItem in navItem.childNavItems"
+                    :title="childNavItem.title"
+                    :value="childNavItem.title"
+                    :to="{path: childNavItem.path}"
+                  >
+                    <template v-slot:prepend>
+                      <v-icon size="small" :icon="childNavItem.icon"/>
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </template>
+            <!--     大屏幕导航选项结束     -->
+          </div>
+        </transition>
       </template>
       <!--   顶部导航结束   -->
     </v-app-bar>
@@ -314,7 +356,7 @@ export default {
           </v-col>
         </v-row>
         <v-list
-          color="#00adb5"
+          color="primary"
           nav
           slim
           lines
@@ -327,23 +369,25 @@ export default {
             <v-list-item
               v-if="navItem.childNavItems === undefined"
               :title="navItem.title"
+              :value="navItem.title"
               :to="navItem.path"
               :prepend-icon="navItem.icon"
             />
             <v-list-group
               v-else
-              color="#00adb5"
+              color="primary"
             >
               <template v-slot:activator="{ props }">
                 <v-list-item
                   v-bind="props"
                   :prepend-icon="navItem.icon"
                   :title="navItem.title"
+                  :value="navItem.title"
                 />
               </template>
               <v-list
                 class="pl-5"
-                color="#00adb5"
+                color="primary"
                 nav
                 slim
                 lines
@@ -352,6 +396,7 @@ export default {
                   v-for="childNavItem in navItem.childNavItems"
                   :prepend-icon="childNavItem.icon"
                   :title="childNavItem.title"
+                  :value="childNavItem.title"
                   :to="childNavItem.path"
                 />
               </v-list>
@@ -384,7 +429,7 @@ export default {
         fluid
       >
         <div v-if="appStore.commitsLoading" class="text-center">
-          <v-progress-circular color="#00adb5" indeterminate/>
+          <v-progress-circular color="primary" indeterminate/>
         </div>
         <v-timeline
           v-else
@@ -429,7 +474,7 @@ export default {
     <v-fab
       @click="goTo('#goto-target-container',{duration:1000,offset:-64})"
       :active="appStore.showFab"
-      color="#00adb5"
+      color="primary"
       icon="mdi-arrow-up"
       variant="tonal"
       location="bottom end"
@@ -444,8 +489,9 @@ export default {
       app
       absolute
     >
-      <v-container class="pa-0 d-flex flex-column justify-center align-center footer-container"
-                   height="150"
+      <v-container
+        class="pa-0 d-flex flex-column justify-center align-center footer-container-border"
+        height="150"
       >
         <p class="v-card-title text-capitalize">
           welcome to shadow blog ~
@@ -474,7 +520,6 @@ export default {
 </template>
 
 <style lang="css">
-
 * {
   scrollbar-width: thin;
   scrollbar-color: #00adb5cc #121212cc;
@@ -532,14 +577,41 @@ export default {
   cursor: pointer;
 }
 
-.dialog-bg-color {
-  background-color: #00000047;
+.footer-container-border {
+  border-inline-start-width: 3px;
+  border-inline-start-style: dashed;
+  animation: border_animation 2s infinite;
+  animation-direction: alternate;
 }
 
-
-.footer-container {
-  border-left: #00adb5 dashed 3px;
-
+@keyframes border_animation {
+  from {
+    border-inline-start-color: rgba(0, 173, 181, 30%);
+  }
+  to {
+    border-inline-start-color: rgba(0, 173, 181, 100%);
+  }
 }
+
+.public-fade-enter-active,
+.public-fade-leave-active {
+  transition: opacity 1s ease;
+  transition-delay: 1s;
+}
+
+.public-fade-enter-from,
+.public-fade-leave-to {
+  opacity: 0;
+}
+
+.app-nav-enter-active {
+  transition: all 0.5s ease;
+}
+
+.app-nav-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
 </style>
 

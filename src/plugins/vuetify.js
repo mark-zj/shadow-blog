@@ -10,7 +10,11 @@ import 'vuetify/styles'
 
 // Composables
 import { createVuetify } from 'vuetify'
+/*
 
+
+
+* */
 const darkTheme = {
   dark: true,
   colors: {
@@ -20,17 +24,45 @@ const darkTheme = {
     'surface-light': '#424242',
     'surface-variant': '#424242',
     'on-surface-variant': '#EEEEEE',
-    primary: '#2196F3',
-    'primary-darken-1': '#277CC1',
-    secondary: '#54B6B2',
-    'secondary-darken-1': '#48A9A6',
-    error: '#CF6679',
+    primary: '#00adb5',
+    'on-primary': '#EEEEEE',
+    secondary: '#48A9A6',
+    'on-secondary': '#EEEEEE',
     info: '#2196F3',
     success: '#4CAF50',
-    warning: '#FB8C00'
+    warning: '#FB8C00',
+    error: '#CF6679',
+    //
+    // primary: '#00adb5',
+    // 'on-primary': '#eeeeeeee',
+    // secondary: '#48A9A6',
+    // 'on-secondary': '#eeeeeeee',
+    //
+    // // background: '#222831',
+    // background: '#393e46',
+    // 'on-background': '#eeeeee',
+    // // VCard ,VFooter,
+    // surface: '#222831',
+    // 'on-surface': '#eeeeee',
+    //
+    // // Tooltip ,
+    // 'surface-variant': '#11999e',
+    // // onTooltip ,
+    // 'on-surface-variant': '#eeeeee',
+    // // 'surface-bright': '',
+    // // 'surface-light': '',
+    //
+    // info: '#2196F3',
+    // 'on-info': '',
+    // success: '#4CAF50',
+    // 'on-success': '',
+    // warning: '#FB8C00',
+    // 'on-warning': '',
+    // error: '#CF6679',
+    // 'on-error': '',
   },
   variables: {
-    'border-color': '#FFFFFF',
+    'border-color': '#00adb5',
     'border-opacity': 0.12,
     'high-emphasis-opacity': 1,
     'medium-emphasis-opacity': 0.70,

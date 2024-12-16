@@ -39,7 +39,7 @@ export default {
                   <div class="w-100 h-100 d-inline-flex justify-center">
                     <v-progress-circular
                       class="align-self-center"
-                      color="#00adb5"
+                      color="primary"
                       indeterminate
                     />
                   </div>
@@ -88,7 +88,7 @@ export default {
     </v-card-item>
     <v-card-item>
       <v-btn text="关于我"
-             color="#00adb5"
+             color="primary"
              variant="outlined"
              block
       />

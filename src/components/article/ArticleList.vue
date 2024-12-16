@@ -64,7 +64,7 @@ export default {
                   class="fill-height ma-0"
                   justify="center"
                 >
-                  <v-progress-circular color="#00adb5" indeterminate/>
+                  <v-progress-circular color="primary" indeterminate/>
                 </v-row>
               </template>
               <template v-slot:error>
@@ -107,7 +107,7 @@ export default {
         @update:modelValue="getArticleListByPage_"
         :length="useArticleList.getTotalPages"
         variant="flat"
-        active-color="#00adb5"
+        active-color="primary"
         density="comfortable"
         next-icon="mdi-menu-right"
         prev-icon="mdi-menu-left"

@@ -38,7 +38,7 @@ export default {
     <template v-slot:loader="{isActive}">
       <v-progress-linear
         :active="isActive"
-        color="#00adb5"
+        color="primary"
         height="3"
         indeterminate
       />

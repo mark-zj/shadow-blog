@@ -36,7 +36,7 @@ export default {
     <template v-slot:loader="{isActive}">
       <v-progress-linear
         :active="isActive"
-        color="#00adb5"
+        color="primary"
         height="3"
         indeterminate
         reverse
@@ -47,7 +47,7 @@ export default {
         <h3>
           <v-icon v-if="article.topMounted"
                   class="pushpin"
-                  color="#00adb5"
+                  color="primary"
                   size="small"
                   icon="mdi-pin"
           />
