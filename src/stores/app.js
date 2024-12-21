@@ -3,7 +3,7 @@ import {defineStore} from 'pinia'
 
 import api from '@/api/index'
 
-export var useAppStore = defineStore('app', {
+export const useAppStore = defineStore('app', {
   actions: {
     welcomeBannerLoadstart(value) {
       console.log('welcomeBanner开始加载...')
