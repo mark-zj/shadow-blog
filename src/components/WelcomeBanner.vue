@@ -1,25 +1,23 @@
 <script>
 import {useGoTo} from "vuetify";
 import {useAppStore} from "@/stores/app";
+import {mapActions, mapState} from "pinia";
 
 export default {
   name: "WelcomeBanner",
   setup() {
     const goTo = useGoTo()
-    const appStore = useAppStore()
     return {
-      goTo, appStore
+      goTo,
     }
   },
-  data: () => ({}),
+  computed: {
+    ...mapState(useAppStore, ['showWelcomeBanner', 'startWelcomeTransition']),
+    ...mapState(useAppStore, ['commitsDrawer']),
+  },
   methods: {
-    bannerImgLoadstart(value) {
-      console.log(value, 'bannerImgLoadstart-首页图开始加载...')
-    },
-    bannerImgLoadend(value) {
-      console.log(value, 'bannerImgLoadend-首页图加载结束 ~')
-      this.appStore.appLaunchOverlay = false;
-    },
+    ...mapActions(useAppStore, ['onShowFab', 'welcomeBannerLoadstart', 'welcomeBannerLoadend']),
+    ...mapActions(useAppStore, ['showCommitsDrawer','onShowCommitsDrawer']),
   },
 }
 </script>
@@ -27,13 +25,13 @@ export default {
 <template>
   <v-parallax
     class="h-screen"
-    v-intersect="appStore.onShowFab"
+    v-intersect="onShowFab"
   >
     <transition name="public-fade">
       <v-img
-        v-if="appStore.showBanner"
-        :onLoadstart="bannerImgLoadstart"
-        :onLoad="bannerImgLoadend"
+        v-show="showWelcomeBanner"
+        :onLoadstart="welcomeBannerLoadstart"
+        :onLoad="welcomeBannerLoadend"
         class="banner-transition"
         src="@/assets/banner-1.jpg"
         width="100%"
@@ -41,16 +39,16 @@ export default {
         cover
       >
         <div class="d-flex flex-column fill-height justify-space-around align-center text-white font-weight-bold">
-          <div class="pt-16 text-h2 text-md-h1 font-weight-thin mb-4">
+          <div class="text-h2 text-md-h1 font-weight-thin mb-4">
             <div class="d-flex gc-3">
               <transition name="banner-title-right-in">
-                <div v-if="appStore.startTransition">
+                <div v-if="startWelcomeTransition">
                   Shadow
                 </div>
               </transition>
               <transition name="banner-title-left-in">
                 <div
-                  v-if="appStore.startTransition"
+                  v-if="startWelcomeTransition"
                   class=" text-md-end font-weight-bold text-decoration-overline"
                 >Blog
                 </div>
@@ -58,20 +56,26 @@ export default {
             </div>
             <transition name="banner-decr-bounce">
               <p
-                v-if="appStore.startTransition"
+                v-if="startWelcomeTransition"
                 class="text-body-1 text-end pt-5">
-              <span
-                class="text-subtitle-1 text-capitalize cursor-pointer"
-                @click="appStore.onShowCommitsDrawer"
-                v-tooltip="{text:'查看更新日志'}"
-              >
-                💦 beta v0.0.1
-              </span>
+                <v-badge
+                  color="red"
+                  :content="commitsDrawer.badgeContent"
+                  floating
+                >
+                  <span
+                    class="text-subtitle-1 text-capitalize cursor-pointer"
+                    @click="showCommitsDrawer"
+                    v-tooltip="{text:'查看更新日志',location:'left'}"
+                  >
+                  💦 beta v0.0.1
+                </span>
+                </v-badge>
               </p>
             </transition>
             <transition name="public-fade">
               <h2
-                v-if="appStore.startTransition"
+                v-if="startWelcomeTransition"
                 class="pt-10 text-subtitle-1 font-weight-bold"
               >
                 😎思想有多远，😁宇宙就有多大
@@ -79,13 +83,13 @@ export default {
             </transition>
           </div>
           <transition name="banner-decr-bottom-bounce">
-            <div v-if="appStore.startTransition">
+            <div v-if="startWelcomeTransition">
               <h3>
                 遇见你时，可否如影随形...
               </h3>
               <div
                 class="banner-arrow pt-10"
-                @click="goTo('#goto-target-container',{duration:2000 , offset: 10})">
+                @click="goTo('#goto-target-container',{duration:2000,offset: -10})">
                 <v-icon icon="mdi-arrow-down"/>
               </div>
             </div>

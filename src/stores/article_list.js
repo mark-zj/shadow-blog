@@ -205,7 +205,6 @@ export const useArticleListStore = defineStore('article_list', {
   actions:{
     // 获取当前目标页的list
     getArticleListByPage(page){
-      console.log(page);
       // this.articleList = [];
     }
   }

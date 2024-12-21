@@ -1,6 +1,8 @@
 <script>
 import {useAppStore} from "@/stores/app";
 import {version, useGoTo} from "vuetify";
+import {mapActions, mapState, mapWritableState} from "pinia";
+import {VScaleTransition} from "vuetify/components";
 
 export default {
   name: "ShadowBlogApp",
@@ -10,101 +12,78 @@ export default {
     return {
       goTo,
       version,
-      appStore
-    }
+      appStore,
+    };
   },
   created() {
-    window.addEventListener('DOMContentLoaded', () => {
-      this.appStore.launch().then(v => {
-        console.info(v);
-      })
+    window.addEventListener('online', () => {
+      console.info("网络已连接！");
+      this.appSnackBar.open = true;
+      this.appSnackBar.text = '网络已连接！';
     });
+    window.addEventListener('offline', () => {
+      console.warn("网络未连接！");
+      this.appSnackBar.open = true;
+      this.appSnackBar.text = '网络未连接！';
+    });
+    if (localStorage.getItem('lookCommitsDrawer') == null) {
+      localStorage.setItem('lookCommitsDrawer',false);
+    }
+    if (localStorage.getItem('preCommitsSize') == null) {
+      localStorage.setItem('preCommitsSize', 0);
+    }
+  },
+  beforeMount() {
+    console.log('Shadow Blog App starting... (beforeMount)');
+    this.appLaunchOverlay = true;
+    this.startAppBarTransition = false;
+    this.showWelcomeBanner = true;
   },
   mounted() {
+    this.launch().then(v => {
+      console.log('启动代码->', v);
+
+      // this.appLaunchOverlay = false; 暂时移动至 welcomeBannerLoadend 中
+      this.startAppBarTransition = true;
+
+      console.log('Shadow Blog App started ~ (mounted)');
+    });
   },
   data: () => ({
     showSearchBox: false,
     showDrawer: false,
-    navItems: [
-      {
-        icon: 'mdi-home',
-        title: '主页',
-        path: '/',
-      },
-      {
-        icon: 'mdi-archive',
-        title: '归档',
-        childNavItems: [
-          {
-            icon: 'mdi-timeline-text',
-            title: '时间轴',
-            path: '/archive/timeline',
-          },
-          {
-            icon: 'mdi-tag',
-            title: '标签',
-            path: '/archive/tag',
-          },
-          {
-            icon: 'mdi-shape',
-            title: '分类',
-            path: '/archive/shape',
-          },
-          {
-            icon: 'mdi-chat',
-            title: '说说',
-            path: '/archive/chat',
-          },
-        ],
-      },
-      {
-        icon: 'mdi-file-cabinet',
-        title: '文件',
-        childNavItems: [
-          {
-            icon: 'mdi-image',
-            title: '相册',
-            path: '/',
-          },
-          {
-            icon: 'mdi-image-multiple',
-            title: '壁纸',
-            path: '/',
-          },
-          {
-            icon: 'mdi-movie-roll',
-            title: '电影',
-            path: '/',
-          },
-        ],
-      },
-      {
-        icon: 'mdi-book-open-page-variant',
-        title: '友人帐',
-        path: '/friend',
-      },
-      {
-        icon: 'mdi-information-variant-box',
-        title: '自言自语',
-        path: '/talk'
-      },
-    ],
     items: Array.from({length: 50}, (k, v) => v + 1),
   }),
-  watch: {
-    // 如果appLaunchOverlay消失就可以开始应用动画
-    'appStore.appLaunchOverlay': {
-      immediate: true,
-      handler(newValue, oldValue) {
-        if (!newValue) {
-          setTimeout(()=>{
-            this.appStore.startTransition = true;
-          },1500);
-        }
-      }
-    }
+  computed: {
+    VScaleTransition() {
+      return VScaleTransition;
+    },
+    ...mapState(useAppStore, ['navItems']),
+    ...mapWritableState(useAppStore, [
+      'appSnackBar',
+    ]),
+    ...mapWritableState(useAppStore, [
+      'appLaunchOverlay', 'startAppBarTransition', 'showWelcomeBanner',
+    ]),
+
+    ...mapWritableState(useAppStore, ['commitsDrawer',]),
+
+    ...mapState(useAppStore, ['showFab']),
   },
   methods: {
+    ...mapActions(useAppStore, ['onShowCommitsDrawer','loadShadowBlogCommits']),
+
+    async launch() {
+      // api
+      await this.loadShadowBlogCommits().then(data => {
+        this.commitsDrawer.commits = data;
+      }).catch(error => {
+        console.error(error);
+      });
+
+      return 0;
+    },
+
     load({done}) {
       setTimeout(() => {
         this.items.push(...Array.from({length: 10}, (k, v) => v + this.items.at(-1) + 1))
@@ -116,7 +95,8 @@ export default {
     },
   },
   destroyed() {
-    window.removeEventListener('DOMContentLoaded');
+    window.removeEventListener('online');
+    window.removeEventListener('offline');
   },
 }
 </script>
@@ -130,12 +110,30 @@ export default {
       persistent
     >
       <div>
-        <v-progress-circular color="primary" indeterminate/>
+        <v-progress-circular color="primary" :indeterminate="appStore.appLaunchOverlay"/>
         <span class="pa-5 font-weight-bold text-subtitle-2">正在启动...</span>
       </div>
       <p class="pa-5">你好，陌生人 ~</p>
     </v-overlay>
     <!--  app 启动遮罩结束  -->
+
+    <!--  上线 离线提示snake bar开始 -->
+    <v-snackbar
+      class="pa-0"
+      color="primary"
+      variant="tonal"
+      v-model="appSnackBar.open"
+      :timeout="appSnackBar.timeout"
+      :transition="{component: VScaleTransition}"
+    >
+      <template #text>
+        <div class="d-inline-flex align-center gc-2">
+          <v-icon icon="mdi-information-box"/>
+          <span>{{appSnackBar.text}}</span>
+        </div>
+      </template>
+    </v-snackbar>
+    <!--  上线 离线提示snake bar结束  -->
 
     <!--    大屏幕导航   -->
     <v-app-bar
@@ -143,12 +141,13 @@ export default {
       order="0"
       color="#121212cc"
       scroll-behavior="hide"
+      density="default"
       elevation="1"
     >
       <v-app-bar-title v-slot:text>
         <transition name="public-fade">
           <span
-            v-show="appStore.startTransition"
+            v-show="startAppBarTransition"
             class="app-bar-title"
           >
               Shadow Blog
@@ -236,7 +235,7 @@ export default {
       <template v-slot:append>
         <transition name="app-nav">
           <div
-            v-if="appStore.startTransition"
+            v-if="startAppBarTransition"
             class="d-inline-flex align-center"
           >
             <!--     搜索框     -->
@@ -409,7 +408,7 @@ export default {
 
     <!--   代码提交日志开始 -->
     <v-navigation-drawer
-      v-model="appStore.showCommitsDrawer"
+      v-model="commitsDrawer.open"
       class="slide-y-transition-move"
       color="#121212cc"
       order="-1"
@@ -418,53 +417,59 @@ export default {
       floating
       temporary
     >
-      <v-container class="pb-0" fluid>
-        <div class="font-weight-bold text-h6">
-          代码提交日志
-        </div>
-        <v-divider class="my-2 border-opacity-75 w-100" thickness="2"/>
-      </v-container>
-      <v-container
-        v-intersect="appStore._getShadowBlogCommits"
-        fluid
-      >
-        <div v-if="appStore.commitsLoading" class="text-center">
-          <v-progress-circular color="primary" indeterminate/>
-        </div>
-        <v-timeline
-          v-else
-          align="center"
-          side="start"
+      <v-container class="h-75" fluid>
+        <v-toolbar
+          color="transparent"
+          title="代码提交日志"
         >
-          <v-timeline-item
-            v-for="(item,index) in appStore.shadowBlogCommits"
-            :key="index" hide-on-leave leave-absolute
-            dot-color="pink"
-            size="small"
+          <v-btn
+            @click="onShowCommitsDrawer"
+            color="primary"
+            icon="mdi-refresh"
+            border
+          />
+        </v-toolbar>
+        <v-divider class="border-opacity-75" thickness="2"/>
+        <v-container class="pa-0 my-3 h-100 overflow-hidden overflow-scroll overflow-x-hidden">
+          <div v-if="commitsDrawer.loading" class="text-center">
+            <v-progress-circular color="primary" indeterminate/>
+          </div>
+          <v-timeline
+            v-else
+            align="center"
+            side="start"
           >
-            <template v-slot:default>
-              <v-card density="compact">
-                <template #text>
-                  <div>
+            <v-timeline-item
+              v-for="(item,index) in commitsDrawer.commits"
+              :key="index" hide-on-leave leave-absolute
+              dot-color="pink"
+              size="small"
+            >
+              <template v-slot:default>
+                <v-card density="compact">
+                  <template #text>
                     <div>
-                      {{ item.commit.message }}
+                      <div>
+                        {{ item.commit.message }}
+                      </div>
+                      <div class="text-caption opacity-70">{{ item.commit.author.date }}</div>
                     </div>
-                    <div class="text-caption opacity-70">{{ item.commit.author.date }}</div>
-                  </div>
-                </template>
-              </v-card>
-            </template>
-            <template v-slot:opposite>
-              <strong>{{ item.commit.author.name }}</strong>
-            </template>
-          </v-timeline-item>
-        </v-timeline>
+                  </template>
+                </v-card>
+              </template>
+              <template v-slot:opposite>
+                <strong>{{ item.commit.author.name }}</strong>
+              </template>
+            </v-timeline-item>
+          </v-timeline>
+        </v-container>
       </v-container>
+
     </v-navigation-drawer>
     <!--  代码提交日志结束  -->
 
     <!--    主体    -->
-    <v-main class="pt-0" id="app-main">
+    <v-main id="app-main">
       <router-view v-slot="{ Component }">
         <component :is="Component"/>
       </router-view>
@@ -472,8 +477,8 @@ export default {
 
     <!--  回到顶部  -->
     <v-fab
-      @click="goTo('#goto-target-container',{duration:1000,offset:-64})"
-      :active="appStore.showFab"
+      @click="goTo('#goto-target-container',{duration:1000})"
+      :active="showFab"
       color="primary"
       icon="mdi-arrow-up"
       variant="tonal"

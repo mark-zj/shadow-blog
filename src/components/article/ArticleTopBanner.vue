@@ -1,5 +1,6 @@
 <script>
 import {useAppStore} from "@/stores/app";
+import {mapActions} from "pinia";
 
 export default {
   name: "ArticleTopBanner",
@@ -9,15 +10,23 @@ export default {
       appStore
     }
   },
+  methods: {
+    ...mapActions(useAppStore, ['onShowFab'])
+  },
 }
 </script>
 
 <template>
-  <v-parallax id="goto-target-container" class="elevation-24" v-intersect="appStore.onShowFab" >
-    <v-img src="@/assets/banner-3.png"
-           width="100%"
-           height="35vh"
-           cover
+  <v-parallax
+    id="goto-target-container"
+    class="elevation-24"
+    v-intersect="onShowFab"
+  >
+    <v-img
+      src="@/assets/banner-3.png"
+      width="100%"
+      height="35vh"
+      cover
     >
       <div class="d-flex flex-column fill-height justify-center align-center text-white font-weight-bold">
         <div class="text-h4">

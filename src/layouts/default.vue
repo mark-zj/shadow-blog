@@ -35,6 +35,7 @@ export default {
   },
   methods: {
     currentPageNot(name) {
+      //alert(this.route.path !== `/${name}`)
       return this.route.path !== `/${name}`;
     }
   }
@@ -51,61 +52,74 @@ export default {
           文章banner
      -->
     <welcome-banner v-if="!currentPageNot('')" key="k1"/>
-    <article-top-banner v-if="!currentPageNot('article')" key="k2"/>
+    <article-top-banner v-else-if="!currentPageNot('article')" key="k2"/>
+    <v-container v-else-if="!currentPageNot('notfound')">
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component id="goto-target-container" :is="Component"/>
+        </keep-alive>
+      </router-view>
+    </v-container>
 
     <!--      下半段   second-half
        文章列表
        选项卡
     -->
-    <v-container class="pt-10" id="goto-target-container">
-      <v-row justify="space-evenly">
-        <!--  文章列表    -->
-        <v-col class="d-flex flex-column"
-               cols="12" sm="12" md="12" lg="9" xl="8" xxl="7"
-        >
-          <router-view v-slot="{ Component }">
-            <keep-alive>
-              <component :is="Component"/>
-            </keep-alive>
-          </router-view>
-        </v-col>
-        <!--     选项卡   tabs    -->
-        <v-col cols="12" sm="12" md="12" lg="3" xl="3" xxl="2">
-          <v-row justify="space-between">
-            <!--      个人   personal    -->
-            <v-col cols="12" >
-              <personal-tab/>
-            </v-col>
-            <!--       公告   notice    -->
-            <v-col cols="12">
-              <notice-tab/>
-            </v-col>
-            <!--        最新文章     Latest articles   -->
-            <v-col cols="12">
-              <latest-article-tab/>
-            </v-col>
-            <!--       标签    显示前十个 tag  -->
-            <v-scale-transition>
-              <v-col cols="12" v-if="currentPageNot('article')">
-                <tag-tab/>
+    <keep-alive>
+      <v-container
+        v-if="currentPageNot('notfound')"
+        class="pt-10"
+        id="goto-target-container"
+      >
+        <v-row justify="space-evenly">
+          <!--  文章 标签 分类    -->
+          <v-col class="d-flex flex-column"
+                 cols="12" sm="12" md="12" lg="9" xl="8" xxl="7"
+          >
+            <router-view v-slot="{ Component }">
+              <keep-alive>
+                <component :is="Component"/>
+              </keep-alive>
+            </router-view>
+          </v-col>
+          <!--     选项卡   tabs    -->
+          <v-col cols="12" sm="12" md="12" lg="3" xl="3" xxl="2">
+            <v-row justify="space-between">
+              <!--      个人   personal    -->
+              <v-col cols="12" >
+                <personal-tab/>
               </v-col>
-            </v-scale-transition>
-            <v-scale-transition>
-              <!--        归档   展示对应的时间线 archive  -->
-              <v-col cols="12" v-if="currentPageNot('article')">
-                <archive-tab/>
+              <!--       公告   notice    -->
+              <v-col cols="12">
+                <notice-tab/>
               </v-col>
-            </v-scale-transition>
-            <v-scale-transition>
-              <!--       网站资讯      website information -->
-              <v-col cols="12" v-if="currentPageNot('article')">
-                <website-information/>
+              <!--        最新文章     Latest articles   -->
+              <v-col cols="12">
+                <latest-article-tab/>
               </v-col>
-            </v-scale-transition>
-          </v-row>
-        </v-col>
-      </v-row>
-    </v-container>
+              <!--       标签    显示前十个 tag  -->
+              <v-scale-transition>
+                <v-col cols="12" v-if="currentPageNot('article')">
+                  <tag-tab/>
+                </v-col>
+              </v-scale-transition>
+              <v-scale-transition>
+                <!--        归档   展示对应的时间线 archive  -->
+                <v-col cols="12" v-if="currentPageNot('article')">
+                  <archive-tab/>
+                </v-col>
+              </v-scale-transition>
+              <v-scale-transition>
+                <!--       网站资讯      website information -->
+                <v-col cols="12" v-if="currentPageNot('article')">
+                  <website-information/>
+                </v-col>
+              </v-scale-transition>
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-container>
+    </keep-alive>
   </v-container>
 </template>
 

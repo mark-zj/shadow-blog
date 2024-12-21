@@ -22,7 +22,7 @@ const darkTheme = {
     surface: '#212121',
     'surface-bright': '#ccbfd6',
     'surface-light': '#424242',
-    'surface-variant': '#424242',
+    'surface-variant': '#00adb5',
     'on-surface-variant': '#EEEEEE',
     primary: '#00adb5',
     'on-primary': '#EEEEEE',
@@ -45,7 +45,7 @@ const darkTheme = {
     // surface: '#222831',
     // 'on-surface': '#eeeeee',
     //
-    // // Tooltip ,
+    // // Tooltip , SnakeBar
     // 'surface-variant': '#11999e',
     // // onTooltip ,
     // 'on-surface-variant': '#eeeeee',
