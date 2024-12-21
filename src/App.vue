@@ -8,11 +8,9 @@ export default {
   name: "ShadowBlogApp",
   setup() {
     const goTo = useGoTo();
-    const appStore = useAppStore();
     return {
       goTo,
       version,
-      appStore,
     };
   },
   created() {
@@ -105,12 +103,12 @@ export default {
   <v-app>
     <!--  app 启动遮罩开始  -->
     <v-overlay
-      :model-value="appStore.appLaunchOverlay"
+      :model-value="appLaunchOverlay"
       class="align-center justify-center text-center"
       persistent
     >
       <div>
-        <v-progress-circular color="primary" :indeterminate="appStore.appLaunchOverlay"/>
+        <v-progress-circular color="primary" :indeterminate="appLaunchOverlay"/>
         <span class="pa-5 font-weight-bold text-subtitle-2">正在启动...</span>
       </div>
       <p class="pa-5">你好，陌生人 ~</p>
