@@ -13,7 +13,7 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base:'/shadow-blog',
+  base:'/',
   mode:'development',
   publicDir:'public',
   build:{
@@ -32,28 +32,25 @@ export default defineConfig({
         assetFileNames(assetInfo) {
           const baseUrl = 'assets'
           if (assetInfo.name.endsWith(".css")) {
-            return `${baseUrl}/css/[name]-[hash].css`
+            return `${baseUrl}/css/[name]-[hash].css`;
           }
           if ([".png", ".jpg", ".jpeg", ".svg", ".ico", ".webp"].some((item) => assetInfo.name.endsWith(item))) {
-            return `${baseUrl}/img/[name]-[hash].[ext]`
+            return `${baseUrl}/img/[name]-[hash].[ext]`;
           }
           if([".ttf",".eot","woff2","woff"].some((item) => assetInfo.name.endsWith(item))) {
-            return `${baseUrl}/fonts/[name]/[hash].[ext]`
+            return `${baseUrl}/fonts/[name]/[hash].[ext]`;
           }
-          return `${baseUrl}/[name]-[hash].[ext]`
+          return `${baseUrl}/[name]-[hash].[ext]`;
         },
-        manualChunks(id) {
-          // Vue 及其相关库的 chunk
-          if (id.includes('vue') || id.includes('core-js') || id.includes('@babel/runtime')) {
-            return 'vendor';
-          }
-          // 其他库的 chunk
-          if (id.includes('node_modules')) {
-            return 'dependencies';
-          }
-          // 默认情况下将模块放入一个单独的 chunk
-          return 'common';
-        },
+        // manualChunks(id) {
+        //   if (id.includes('vuetify')) {
+        //     return 'vuetify';
+        //   }
+        //   if (id.includes('node_modules')) {
+        //     return 'dependencies';
+        //   }
+        //   return 'common';
+        // },
       },
     },
   },
