@@ -1,9 +1,19 @@
 <script>
 import ArticleDetail from "@/components/article/ArticleDetail.vue";
+import {mapWritableState} from "pinia";
+import {useAppStore} from "@/stores/app";
 
 export default {
   name: 'Article',
-  components: {ArticleDetail}
+  components: {ArticleDetail},
+  mounted() {
+    this.appLaunchOverlay = false;
+  },
+  computed: {
+    ...mapWritableState(useAppStore, [
+      'appLaunchOverlay',
+    ]),
+  },
 }
 </script>
 

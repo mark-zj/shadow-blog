@@ -56,17 +56,10 @@ export default {
     VScaleTransition() {
       return VScaleTransition;
     },
-    ...mapState(useAppStore, ['navItems']),
+    ...mapState(useAppStore, ['navItems','showFab']),
     ...mapWritableState(useAppStore, [
-      'appSnackBar',
+      'appSnackBar','appLaunchOverlay', 'startAppBarTransition', 'showWelcomeBanner','commitsDrawer',
     ]),
-    ...mapWritableState(useAppStore, [
-      'appLaunchOverlay', 'startAppBarTransition', 'showWelcomeBanner',
-    ]),
-
-    ...mapWritableState(useAppStore, ['commitsDrawer',]),
-
-    ...mapState(useAppStore, ['showFab']),
   },
   methods: {
     ...mapActions(useAppStore, ['onShowCommitsDrawer','loadShadowBlogCommits']),

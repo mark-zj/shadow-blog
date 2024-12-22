@@ -1,6 +1,17 @@
 <script>
+import {mapWritableState} from "pinia";
+import {useAppStore} from "@/stores/app";
+
 export default {
-  name: "timeline"
+  name: "timeline",
+  mounted() {
+    this.appLaunchOverlay = false;
+  },
+  computed: {
+    ...mapWritableState(useAppStore, [
+      'appLaunchOverlay',
+    ]),
+  },
 }
 </script>
 
