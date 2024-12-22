@@ -3,104 +3,100 @@ import {mapActions, mapState, mapWritableState} from "pinia";
 import {useAppStore} from "@/stores/app";
 import {version, useGoTo} from "vuetify";
 import {VScaleTransition} from "vuetify/components";
-import {defineComponent} from "vue";
 
-export default defineComponent(
-    {
-        name: "ShadowBlogApp",
-        setup() {
-            const goTo = useGoTo();
-            return {
-                goTo,
-                version,
-            };
-        },
-        created() {
-            window.addEventListener('online', () => {
-                console.info("网络已连接！");
-                this.appSnackBar.open = true;
-                this.appSnackBar.text = '网络已连接！';
-            });
-            window.addEventListener('offline', () => {
-                console.warn("网络未连接！");
-                this.appSnackBar.open = true;
-                this.appSnackBar.text = '网络未连接！';
-            });
-            if (localStorage.getItem('lookCommitsDrawer') == null) {
-                localStorage.setItem('lookCommitsDrawer',false);
-            }
-            if (localStorage.getItem('preCommitsSize') == null) {
-                localStorage.setItem('preCommitsSize', 0);
-            }
-        },
-        beforeMount() {
-            console.log('Shadow Blog App starting... (beforeMount)');
-            this.appLaunchOverlay = true;
-            this.startAppBarTransition = false;
-            this.showWelcomeBanner = true;
-        },
-        mounted() {
-            this.launch().then(v => {
-                console.log('启动代码->', v);
-
-                // this.appLaunchOverlay = false; 暂时移动至 welcomeBannerLoadend 中
-                this.startAppBarTransition = true;
-
-                console.log('Shadow Blog App started ~ (mounted)');
-            });
-        },
-        data: () => ({
-            showSearchBox: false,
-            showDrawer: false,
-            items: Array.from({length: 50}, (k, v) => v + 1),
-        }),
-        computed: {
-            VScaleTransition() {
-                return VScaleTransition;
-            },
-            ...mapState(useAppStore, ['navItems']),
-            ...mapWritableState(useAppStore, [
-                'appSnackBar',
-            ]),
-            ...mapWritableState(useAppStore, [
-                'appLaunchOverlay', 'startAppBarTransition', 'showWelcomeBanner',
-            ]),
-
-            ...mapWritableState(useAppStore, ['commitsDrawer',]),
-
-            ...mapState(useAppStore, ['showFab']),
-        },
-        methods: {
-            ...mapActions(useAppStore, ['onShowCommitsDrawer','loadShadowBlogCommits']),
-
-            async launch() {
-                // api
-                await this.loadShadowBlogCommits().then(data => {
-                    this.commitsDrawer.commits = data;
-                }).catch(error => {
-                    console.error(error);
-                });
-
-                return 0;
-            },
-
-            load({done}) {
-                setTimeout(() => {
-                    this.items.push(...Array.from({length: 10}, (k, v) => v + this.items.at(-1) + 1))
-                    done('ok')
-                }, 1000)
-            },
-            goToRoute(path) {
-                this.$router.push({path: path});
-            },
-        },
-        destroyed() {
-            window.removeEventListener('online');
-            window.removeEventListener('offline');
-        },
+export default {
+  name: "ShadowBlogApp",
+  setup() {
+    const goTo = useGoTo();
+    return {
+      goTo,
+      version,
+    };
+  },
+  created() {
+    window.addEventListener('online', () => {
+      console.info("网络已连接！");
+      this.appSnackBar.open = true;
+      this.appSnackBar.text = '网络已连接！';
+    });
+    window.addEventListener('offline', () => {
+      console.warn("网络未连接！");
+      this.appSnackBar.open = true;
+      this.appSnackBar.text = '网络未连接！';
+    });
+    if (localStorage.getItem('lookCommitsDrawer') == null) {
+      localStorage.setItem('lookCommitsDrawer',false);
     }
-)
+    if (localStorage.getItem('preCommitsSize') == null) {
+      localStorage.setItem('preCommitsSize', 0);
+    }
+  },
+  beforeMount() {
+    console.log('Shadow Blog App starting... (beforeMount)');
+    this.appLaunchOverlay = true;
+    this.startAppBarTransition = false;
+    this.showWelcomeBanner = true;
+  },
+  mounted() {
+    this.launch().then(v => {
+      console.log('启动代码->', v);
 
+      // this.appLaunchOverlay = false; 暂时移动至 welcomeBannerLoadend 中
+      this.startAppBarTransition = true;
+
+      console.log('Shadow Blog App started ~ (mounted)');
+    });
+  },
+  data: () => ({
+    showSearchBox: false,
+    showDrawer: false,
+    items: Array.from({length: 50}, (k, v) => v + 1),
+  }),
+  computed: {
+    VScaleTransition() {
+      return VScaleTransition;
+    },
+    ...mapState(useAppStore, ['navItems']),
+    ...mapWritableState(useAppStore, [
+      'appSnackBar',
+    ]),
+    ...mapWritableState(useAppStore, [
+      'appLaunchOverlay', 'startAppBarTransition', 'showWelcomeBanner',
+    ]),
+
+    ...mapWritableState(useAppStore, ['commitsDrawer',]),
+
+    ...mapState(useAppStore, ['showFab']),
+  },
+  methods: {
+    ...mapActions(useAppStore, ['onShowCommitsDrawer','loadShadowBlogCommits']),
+
+    async launch() {
+      // api
+      await this.loadShadowBlogCommits().then(data => {
+        this.commitsDrawer.commits = data;
+      }).catch(error => {
+        console.error(error);
+      });
+
+      return 0;
+    },
+
+    load({done}) {
+      setTimeout(() => {
+        this.items.push(...Array.from({length: 10}, (k, v) => v + this.items.at(-1) + 1))
+        done('ok')
+      }, 1000)
+    },
+    goToRoute(path) {
+      this.$router.push({path: path});
+    },
+  },
+  destroyed() {
+    window.removeEventListener('online');
+    window.removeEventListener('offline');
+  },
+}
 </script>
 
 <template>
