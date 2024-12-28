@@ -63,7 +63,26 @@ export const useAppStore = defineStore('app', {
         console.log(error);
         return error;
       });
-    }
+    },
+    // 获取访客的系统，浏览器名称以及屏幕是否能够触摸和ssr
+    async loadVisitorInfo(app) {
+      var platform = app.$vuetify.display.platform;
+      let field = null;
+      let knows = [];
+      const that = this;
+
+      function filter_(visitorInfoField) {
+        that.visitorInfo.platform[`${visitorInfoField}`] =
+          that.visitorInfo.platform[`${visitorInfoField}`].filter(value => knows.includes(value));
+      }
+
+      for (field in platform) if (platform[field]) knows.push(field);
+      filter_('systems');
+      filter_('browsers');
+      this.visitorInfo.platform.touch = knows.includes('touch');
+      this.visitorInfo.platform.ssr = knows.includes('ssr');
+      console.log(this.visitorInfo);
+    },
   },
   state: () => ({
     appLaunchOverlay: false,//app 启动遮罩
@@ -85,6 +104,18 @@ export const useAppStore = defineStore('app', {
       commits: [],// 项目代码提交数据
       // 项目代码提交数据的数量
       badgeContent: 0,
+    },
+    // 访客信息
+    visitorInfo: {
+      open: false,
+      platform: {
+        systems: ['android', 'ios', 'win', 'mac', 'linux',],
+        browsers: ['chrome', 'edge', 'firefox', 'opera',],
+        touch: false,
+        ssr: false,
+        // cordova ???
+        // electron ???
+      },
     },
     // app 导航项
     navItems: [

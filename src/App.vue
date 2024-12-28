@@ -2,7 +2,6 @@
 import {mapActions, mapState, mapWritableState} from "pinia";
 import {useAppStore} from "@/stores/app";
 import {version, useGoTo} from "vuetify";
-import {VScaleTransition} from "vuetify/components";
 
 export default {
   name: "ShadowBlogApp",
@@ -25,7 +24,7 @@ export default {
       this.appSnackBar.text = '网络未连接！';
     });
     if (localStorage.getItem('lookCommitsDrawer') == null) {
-      localStorage.setItem('lookCommitsDrawer',false);
+      localStorage.setItem('lookCommitsDrawer', false);
     }
     if (localStorage.getItem('preCommitsSize') == null) {
       localStorage.setItem('preCommitsSize', 0);
@@ -40,6 +39,10 @@ export default {
   mounted() {
     this.launch().then(v => {
       console.log('启动代码->', v);
+      // todo:暂时 没到顶部就不会触发回调
+      if (this.showFab) {
+        this.appLaunchOverlay = false;
+      }
 
       // this.appLaunchOverlay = false; 暂时移动至 welcomeBannerLoadend 中
       this.startAppBarTransition = true;
@@ -48,33 +51,32 @@ export default {
     });
   },
   data: () => ({
+    showToolBoxOverlay: false,
+    visitorCard: {
+      openedPanels: ['systems', 'browsers', 'ssr', 'touch'],
+    },
     showSearchBox: false,
     showDrawer: false,
     items: Array.from({length: 50}, (k, v) => v + 1),
   }),
   computed: {
-    VScaleTransition() {
-      return VScaleTransition;
-    },
-    ...mapState(useAppStore, ['navItems','showFab']),
+    ...mapState(useAppStore, ['navItems', 'showFab', 'visitorInfo']),
     ...mapWritableState(useAppStore, [
-      'appSnackBar','appLaunchOverlay', 'startAppBarTransition', 'showWelcomeBanner','commitsDrawer',
+      'appSnackBar', 'appLaunchOverlay', 'startAppBarTransition', 'showWelcomeBanner', 'commitsDrawer',
     ]),
   },
   methods: {
-    ...mapActions(useAppStore, ['onShowCommitsDrawer','loadShadowBlogCommits']),
+    ...mapActions(useAppStore, ['onShowCommitsDrawer', 'loadShadowBlogCommits']),
+    ...mapActions(useAppStore, ['loadVisitorInfo',]),
 
     async launch() {
+      await this.loadVisitorInfo(this);
       // api
-      await this.loadShadowBlogCommits().then(data => {
-        this.commitsDrawer.commits = data;
-      }).catch(error => {
+      this.commitsDrawer.commits = await this.loadShadowBlogCommits().catch(error => {
         console.error(error);
       });
-
       return 0;
     },
-
     load({done}) {
       setTimeout(() => {
         this.items.push(...Array.from({length: 10}, (k, v) => v + this.items.at(-1) + 1))
@@ -115,33 +117,35 @@ export default {
       variant="tonal"
       v-model="appSnackBar.open"
       :timeout="appSnackBar.timeout"
-      :transition="{component: VScaleTransition}"
+      transition="scale-transition"
     >
       <template #text>
         <div class="d-inline-flex align-center gc-2">
           <v-icon icon="mdi-information-box"/>
-          <span>{{appSnackBar.text}}</span>
+          <span>{{ appSnackBar.text }}</span>
         </div>
       </template>
     </v-snackbar>
     <!--  上线 离线提示snake bar结束  -->
-
-    <!--    大屏幕导航   -->
+    <!--  app layout  -->
+    <!--    大屏幕导航开始  -->
     <v-app-bar
       class="px-5"
       order="0"
       color="#121212cc"
-      scroll-behavior="hide"
-      density="default"
+      image="@/assets/banner-1.jpg"
+      scroll-behavior="fade-image inverted"
+      scroll-threshold="2000"
+      density="comfortable"
       elevation="1"
     >
       <v-app-bar-title v-slot:text>
         <transition name="public-fade">
           <span
+            class="app-bar-title d-inline-block"
             v-show="startAppBarTransition"
-            class="app-bar-title"
           >
-              Shadow Blog
+            Shadow Blog
           </span>
         </transition>
       </v-app-bar-title>
@@ -302,6 +306,7 @@ export default {
       </template>
       <!--   顶部导航结束   -->
     </v-app-bar>
+    <!--    大屏幕导航结束  -->
 
     <!--    小屏幕导航开始   -->
     <v-navigation-drawer
@@ -455,7 +460,6 @@ export default {
           </v-timeline>
         </v-container>
       </v-container>
-
     </v-navigation-drawer>
     <!--  代码提交日志结束  -->
 
@@ -465,18 +469,6 @@ export default {
         <component :is="Component"/>
       </router-view>
     </v-main>
-
-    <!--  回到顶部  -->
-    <v-fab
-      @click="goTo('#goto-target-container',{duration:1000})"
-      :active="showFab"
-      color="primary"
-      icon="mdi-arrow-up"
-      variant="tonal"
-      location="bottom end"
-      app
-      appear
-    />
 
     <!--页脚开始 -->
     <v-footer
@@ -489,13 +481,21 @@ export default {
         class="pa-0 d-flex flex-column justify-center align-center footer-container-border"
         height="150"
       >
-        <p class="v-card-title text-capitalize">
-          welcome to shadow blog ~
-        </p>
+        <div>
+          <div class="v-card-title text-capitalize">
+            welcome to shadow blog ~
+          </div>
+          <div class="text-subtitle-2 text-end">
+            💦 Copyright © 2024-2025
+          </div>
+        </div>
         <div class="text-left opacity-80">
           <div class="text-overline">
-            <div class="text-subtitle-1">
-              ©2024-2025 By Mark·ZJ
+            <div class="text-subtitle-2">
+              Designed By
+              <span class="cursor-pointer">
+                <strong>Mark·ZJ</strong>
+              </span>
             </div>
             <div class="text-subtitle-2">
               Powered By
@@ -505,13 +505,196 @@ export default {
               </span>
             </div>
           </div>
-          <div class="text-subtitle-2">
+          <div class="text-subtitle-2 text-disabled">
             备案号:湘 ICP 备 xxxxxxxx 号
           </div>
         </div>
       </v-container>
     </v-footer>
     <!--页脚结束 -->
+
+    <!--  工具Fab 开始 -->
+    <v-overlay
+      v-model="showToolBoxOverlay"
+      scrim="#12121250"
+      scroll-strategy="none"
+      content-class="bottom-0 top-0 left-0 right-0"
+      close-on-content-click>
+      <v-container class="fill-height justify-center align-center">
+        <v-card
+          class="pa-5 overflow-y-auto overflow-x-hidden"
+          width="560px"
+          height="550px"
+          color="#121212"
+          prepend-icon="mdi-devices"
+          title="设备信息"
+          :link="false"
+          :ripple="false"
+          :hover="false"
+          border
+          @click.stop
+        >
+          <v-card-subtitle>运行环境</v-card-subtitle>
+          <v-card-item>
+            <v-divider color="primary"/>
+          </v-card-item>
+          <v-card-item>
+            <v-expansion-panels
+              v-model="visitorCard.openedPanels"
+              variant="accordion"
+              bg-color="transparent"
+              multiple
+              focusable
+              static
+            >
+              <v-expansion-panel value="systems">
+                <v-expansion-panel-title>
+                  <div class="d-inline-flex align-center gc-1">
+                    <v-icon icon="mdi-cog-outline"/>
+                    系统
+                  </div>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <v-chip-group
+                    v-model="visitorInfo.platform.systems"
+                    selected-class="bg-success opacity-100"
+                    variant="plain"
+                    disabled
+                    filter
+                    column
+                  >
+                    <v-chip value="android" prepend-icon="mdi-android" text="Android"/>
+                    <v-chip value="ios" prepend-icon="mdi-apple-ios" text="IOS"/>
+                    <v-chip value="win" prepend-icon="mdi-microsoft-windows" text="Windows"/>
+                    <v-chip value="mac" prepend-icon="mdi-apple-keyboard-command" text="Mac"/>
+                    <v-chip value="linux" prepend-icon="mdi-linux" text="Linux"/>
+                  </v-chip-group>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+              <v-expansion-panel value="browsers">
+                <v-expansion-panel-title>
+                  <div class="d-inline-flex align-center gc-1">
+                    <v-icon icon="mdi-monitor-eye"/>
+                    浏览器
+                  </div>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <v-chip-group
+                    v-model="visitorInfo.platform.browsers"
+                    variant="plain"
+                    selected-class="bg-success opacity-100"
+                    disabled
+                    filter
+                    column
+                  >
+                    <v-chip value="chrome" prepend-icon="mdi-google-chrome" text="Chrome"/>
+                    <v-chip value="edge" prepend-icon="mdi-microsoft-edge" text="Edge"/>
+                    <v-chip value="firefox" prepend-icon="mdi-firefox" text="Firefox"/>
+                    <v-chip value="opera" prepend-icon="mdi-opera" text="Opera"/>
+                  </v-chip-group>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+              <v-expansion-panel
+                value="ssr"
+                :focusable="false"
+                hide-actions
+              >
+                <v-expansion-panel-title>
+                  <div class="d-inline-flex align-center gc-1">
+                    <v-icon icon="mdi-server-network-outline"/>
+                    SSR 渲染
+                  </div>
+                  <template v-if="visitorInfo.platform.ssr">✅</template>
+                  <template v-else>❌</template>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <div class="text-subtitle-2">
+                    服务器端动态生成Web页面
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+              <v-expansion-panel
+                value="touch"
+                :focusable="false"
+                hide-actions
+              >
+                <v-expansion-panel-title>
+                  <div class="d-inline-flex align-center gc-1">
+                    <v-icon icon="mdi-gesture-tap-button"/>
+                    可触摸
+                  </div>
+                  <template v-if="visitorInfo.platform.touch">✅</template>
+                  <template v-else>❌</template>
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <div class="text-subtitle-2">
+                    使用可触摸界面交互
+                  </div>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </v-card-item>
+        </v-card>
+      </v-container>
+    </v-overlay>
+    <v-speed-dial
+      location="right center"
+      location-strategy="connected"
+      content-class="flex-column"
+      close-delay="1000"
+      open-delay="0"
+      open-on-click
+      open-on-hover
+    >
+      <template v-slot:activator="{ props }">
+        <v-fab
+          v-bind="props"
+          icon="mdi-toolbox"
+          color="primary"
+          variant="outlined"
+          location="left center"
+          app
+          appear
+          rounded
+        />
+      </template>
+      <template #default>
+        <v-btn
+          key="1"
+          color="primary"
+          icon="mdi-devices"
+          v-tooltip="{text: '设备信息'}"
+          @click="showToolBoxOverlay = true"
+        />
+        <v-btn
+          key="2"
+          color="primary"
+          icon="mdi-comment-alert"
+          v-tooltip="{text: '建议反馈(建设中...)'}"
+        />
+
+          <v-btn
+                  key="3"
+                  color="primary"
+                  icon="mdi-wrench"
+                  v-tooltip="{text: '更多功能正在加入...'}"
+          />
+      </template>
+    </v-speed-dial>
+    <!--  工具Fab 结束 -->
+
+    <!--  回到顶部  -->
+    <v-fab
+      @click="goTo('#goto-target-container',{duration:1000})"
+      :active="showFab"
+      color="primary"
+      icon="mdi-arrow-up"
+      variant="tonal"
+      location="bottom end"
+      order="-1"
+      app
+      appear
+    />
   </v-app>
 </template>
 

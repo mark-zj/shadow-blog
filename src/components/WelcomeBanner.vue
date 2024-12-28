@@ -74,12 +74,12 @@ export default {
               </p>
             </transition>
             <transition name="public-fade">
-              <h2
+              <div
                 v-if="startWelcomeTransition"
                 class="pt-10 text-subtitle-1 font-weight-bold"
               >
                 😎思想有多远，😁宇宙就有多大
-              </h2>
+              </div>
             </transition>
           </div>
           <transition name="banner-decr-bottom-bounce">
