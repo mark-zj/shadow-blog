@@ -17,4 +17,7 @@ const app = createApp(App)
 
 registerPlugins(app)
 
+// 屏蔽警告信息
+app.config.warnHandler = () => null;
+
 app.mount('#app')
