@@ -10,7 +10,7 @@ export default {
 </script>
 
 <template>
-  <v-card class="pa-2" color="#121212cc">
+  <v-card class="pa-2" color="rgba(var(--v-theme-surface) , .8)">
     <v-card-item>
       <template #prepend>
         <v-icon icon="mdi-tag-multiple"/>
@@ -22,11 +22,13 @@ export default {
     </v-card-item>
     <v-card-item class="pt-0">
       <v-chip-group column>
-        <v-chip v-for="(item,index) in tags" :key="index"
-                :text="item"
-                class="mr-1 chip-tag"
-                density="comfortable"
-                label
+        <v-chip
+          v-for="(item,index) in tags"
+          :key="index"
+          :text="item"
+          class="mr-1 chip-tag"
+          density="comfortable"
+          label
         />
       </v-chip-group>
     </v-card-item>
@@ -34,12 +36,11 @@ export default {
 </template>
 
 <style lang="css" scoped>
-
 .chip-tag {
   transition: color .3s ease;
 }
 
 .chip-tag:hover {
-  color: #00adb5;
+  color: rgb(var(--v-theme-primary));
 }
 </style>

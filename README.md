@@ -118,3 +118,25 @@ npm install axios
 ```text
 做了两天太难了
 ```
+
+
+# bug
+hover 无法应用主题颜色
+```css
+.app-bar-nav-item:hover::after {
+  width: 100%;
+  background-color: $footer-border-from-color;
+}
+
+.article-arrow-expand:hover {
+    cursor: pointer;
+    color: var(--v-theme-primary);
+}
+```
+
+```text
+将css类分开 
+尝试使用v-hover
+
+(我是sb rbg都没有...)
+```

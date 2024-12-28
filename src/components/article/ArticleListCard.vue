@@ -107,7 +107,7 @@ export default {
 
 .article-arrow-expand:hover {
   cursor: pointer;
-  color: #00adb5;
+  color: rgb(var(--v-theme-primary));
 }
 
 .pushpin {

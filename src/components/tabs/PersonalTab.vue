@@ -19,7 +19,7 @@ export default {
 </script>
 
 <template>
-  <v-card color="transparent"
+  <v-card color="rgba(var(--v-theme-primary) , .05)"
           elevation="0"
   >
     <v-card-item>

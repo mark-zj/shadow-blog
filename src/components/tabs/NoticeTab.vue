@@ -31,8 +31,7 @@ export default {
 
 <template>
   <v-card class="pa-2 public-transition"
-          color="#121212cc"
-
+          color="rgba(var(--v-theme-surface) , .8)"
           :loading="noticeInfoLoading"
   >
     <template v-slot:loader="{isActive}">

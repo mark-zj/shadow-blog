@@ -24,7 +24,7 @@ export default {
 
 <template>
   <v-parallax
-    class="h-screen"
+    :class="{'h-screen': this.$vuetify.theme.name === 'shadowTheme','h-0': true}"
     v-intersect="onShowFab"
   >
     <transition name="public-fade">

@@ -5,7 +5,7 @@ export default {
 </script>
 
 <template>
-  <v-card class="pa-2" color="#121212cc">
+  <v-card class="pa-2" color="rgba(var(--v-theme-surface) , .8)">
     <v-card-item>
       <template #prepend>
         <v-icon icon="mdi-zip-box"/>
@@ -46,6 +46,6 @@ export default {
 }
 
 .zip-nav-hover:hover > .v-list-item__append > .v-icon {
-  color: #00adb5;
+  color: rgb(var(--v-theme-primary));
 }
 </style>

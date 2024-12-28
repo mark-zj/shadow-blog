@@ -86,6 +86,10 @@ export default {
     goToRoute(path) {
       this.$router.push({path: path});
     },
+    async toggleThemeByName(themeName) {
+      const theme = this.$vuetify.theme;
+      theme.name = themeName;
+    },
   },
   destroyed() {
     window.removeEventListener('online');
@@ -132,14 +136,14 @@ export default {
     <v-app-bar
       class="px-5"
       order="0"
-      color="#121212cc"
-      image="@/assets/banner-1.jpg"
+      color="rgba(var(--v-theme-surface) , .6)"
+      :image="$vuetify.theme.name === 'shadowTheme' ? 'src/assets/banner-1.jpg' : ''"
       scroll-behavior="fade-image inverted"
       scroll-threshold="2000"
       density="comfortable"
-      elevation="1"
+      elevation="0"
     >
-      <v-app-bar-title v-slot:text>
+      <v-app-bar-title #text>
         <transition name="public-fade">
           <span
             class="app-bar-title d-inline-block"
@@ -172,7 +176,7 @@ export default {
                     variant="solo"
                     min-width="300px"
                     max-width="300px"
-                    bg-color="#121212cc"
+                    bg-color="rgba(var(--v-theme-surface) , .8)"
                     color="primary"
                     density="comfortable"
                     hide-details
@@ -189,14 +193,14 @@ export default {
                     @click="showSearchBox = !showSearchBox"
                     class="ml-5"
                     icon="mdi-close"
-                    color="#121212cc"
+                    color="rgba(var(--v-theme-surface) , .8)"
                   />
                 </v-col>
                 <v-col cols="12">
                   <!--  结果-->
                   <v-sheet
                     class="pa-5 border-opacity-75"
-                    color="#121212cc"
+                    color="rgba(var(--v-theme-surface) , .8)"
                     border
                   >
                     <div class="v-card-title">
@@ -281,7 +285,7 @@ export default {
                 </template>
                 <v-list
                   class="pa-0"
-                  bg-color="#1212127f"
+                  bg-color="rgba(var(--v-theme-surface) , .5)"
                   color="primary"
                   nav
                   slim
@@ -312,7 +316,7 @@ export default {
     <v-navigation-drawer
       v-model="showDrawer"
       class="hidden-md-and-up slide-y-transition-move"
-      color="#121212cc"
+      color="rgba(var(--v-theme-surface) , .8)"
       order="-1"
       location="left"
       floating
@@ -406,7 +410,7 @@ export default {
     <v-navigation-drawer
       v-model="commitsDrawer.open"
       class="slide-y-transition-move"
-      color="#121212cc"
+      color="rgba(var(--v-theme-surface) , .8)"
       order="-1"
       location="left"
       width="350"
@@ -464,7 +468,7 @@ export default {
     <!--  代码提交日志结束  -->
 
     <!--    主体    -->
-    <v-main id="app-main">
+    <v-main id="app-main" :class="{'app-main-bg-image': $vuetify.theme.name === 'shadowTheme'}">
       <router-view v-slot="{ Component }">
         <component :is="Component"/>
       </router-view>
@@ -473,7 +477,7 @@ export default {
     <!--页脚开始 -->
     <v-footer
       class="public-transition"
-      color="#121212cc"
+      color="rgba(var(--v-theme-surface) , .8)"
       app
       absolute
     >
@@ -525,7 +529,7 @@ export default {
           class="pa-5 overflow-y-auto overflow-x-hidden"
           width="560px"
           height="550px"
-          color="#121212"
+          color="rgba(var(--v-theme-surface) , 1)"
           prepend-icon="mdi-devices"
           title="设备信息"
           :link="false"
@@ -534,10 +538,36 @@ export default {
           border
           @click.stop
         >
-          <v-card-subtitle>运行环境</v-card-subtitle>
+            <v-card-item>
+                <v-divider color="primary"/>
+            </v-card-item>
+          <v-card-subtitle># 主题</v-card-subtitle>
           <v-card-item>
-            <v-divider color="primary"/>
+            <v-row>
+              <v-col cols="12">
+                <div class="v-card-subtitle">
+                  Vuetify 内置
+                </div>
+                <v-btn-group color="primary" variant="outlined">
+                  <v-btn text="明亮" @click.stop="toggleThemeByName('light')"/>
+                  <v-btn text="暗黑" @click.stop="toggleThemeByName('dark')"/>
+                </v-btn-group>
+              </v-col>
+              <v-col cols="12">
+                <div class="v-card-subtitle">
+                  定制化
+                </div>
+                <v-btn-group color="primary" variant="outlined">
+                  <v-btn text="影子主题" @click.stop="toggleThemeByName('shadowTheme')"/>
+                  <v-btn text="简洁主题" @click.stop="toggleThemeByName('simpleTheme')"/>
+                </v-btn-group>
+              </v-col>
+            </v-row>
           </v-card-item>
+            <v-card-item>
+                <v-divider color="primary"/>
+            </v-card-item>
+          <v-card-subtitle># 运行环境</v-card-subtitle>
           <v-card-item>
             <v-expansion-panels
               v-model="visitorCard.openedPanels"
@@ -672,13 +702,12 @@ export default {
           icon="mdi-comment-alert"
           v-tooltip="{text: '建议反馈(建设中...)'}"
         />
-
-          <v-btn
-                  key="3"
-                  color="primary"
-                  icon="mdi-wrench"
-                  v-tooltip="{text: '更多功能正在加入...'}"
-          />
+        <v-btn
+          key="3"
+          color="primary"
+          icon="mdi-wrench"
+          v-tooltip="{text: '更多功能正在加入...'}"
+        />
       </template>
     </v-speed-dial>
     <!--  工具Fab 结束 -->
@@ -698,17 +727,26 @@ export default {
   </v-app>
 </template>
 
-<style lang="css">
+<style lang="scss">
+@import '@/styles/main';
+
+// 预置前置变量(保证不暴红) 框架进行替换
+:root {
+  --v-theme-primary: '';
+  --v-theme-background: '';
+}
+
 * {
   scrollbar-width: thin;
-  scrollbar-color: #00adb5cc #121212cc;
+  // scss 中使用变量就可以分开写
+  scrollbar-color: rgba($scrollbar-color-frontend, 1) rgba($scrollbar-color-backend, .4);
 }
 
 .public-transition > * {
   transition: all 1s ease-in-out;
 }
 
-#app-main {
+.app-main-bg-image {
   position: relative;
   background-position: center center;
   background-attachment: fixed;
@@ -728,7 +766,6 @@ export default {
 }
 
 .app-bar-nav-item {
-  color: #eeeeee;
   font-size: .9rem;
   opacity: 0.7;
   transition: .5s;
@@ -748,7 +785,7 @@ export default {
 
 .app-bar-nav-item:hover::after {
   width: 100%;
-  background-color: #00adb5;
+  background-color: rgb(var(--v-theme-primary));
 }
 
 .app-bar-nav-item:hover {
@@ -765,10 +802,10 @@ export default {
 
 @keyframes border_animation {
   from {
-    border-inline-start-color: rgba(0, 173, 181, 30%);
+    border-inline-start-color: rgba($footer-border-from-color, 30%);
   }
   to {
-    border-inline-start-color: rgba(0, 173, 181, 100%);
+    border-inline-start-color: rgba($footer-border-to-color, 100%);
   }
 }
 
