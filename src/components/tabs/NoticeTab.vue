@@ -30,7 +30,8 @@ export default {
 </script>
 
 <template>
-  <v-card class="pa-2 public-transition"
+  <!-- public-transition 在主题切换时导致有速度有变化 -->
+  <v-card class="pa-2"
           color="rgba(var(--v-theme-surface) , .8)"
           :loading="noticeInfoLoading"
   >

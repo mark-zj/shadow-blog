@@ -16,19 +16,22 @@ export default {
       <v-divider/>
     </v-card-subtitle>
     <v-card-item>
-      <v-list class="pa-0"
-              bg-color="transparent"
-              nav
+      <v-list
+        class="pa-0"
+        bg-color="transparent"
+        variant="tonal"
+        nav
+        slim
+        lines
       >
-        <v-list-item v-for="(index) in 5" :key="index"
-                     :title="'2024年1月' + index + '日'"
-                     :subtitle="index + '篇文章'"
-                     class="zip-nav-hover"
-                     color="transparent"
-                     variant="tonal"
-                     slim
-                     link
-                     lines
+        <v-list-item
+          v-for="(index) in 5"
+          :key="index"
+          :title="'2024年1月' + index + '日'"
+          :subtitle="index + '篇文章'"
+          class="zip-nav-hover"
+          color="transparent"
+          link
         >
           <template v-slot:append>
             <v-icon icon="mdi-arrow-right" size="20"/>

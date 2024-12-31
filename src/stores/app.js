@@ -81,7 +81,7 @@ export const useAppStore = defineStore('app', {
       filter_('browsers');
       this.visitorInfo.platform.touch = knows.includes('touch');
       this.visitorInfo.platform.ssr = knows.includes('ssr');
-      console.log(this.visitorInfo);
+      // console.log(this.visitorInfo);
     },
   },
   state: () => ({
