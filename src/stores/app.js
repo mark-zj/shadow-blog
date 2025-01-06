@@ -36,7 +36,7 @@ export const useAppStore = defineStore('app', {
     loadShadowBlogCommits() {
       return api.App.getShadowBlogCommits().then(data => {
         console.log('开始获取项目代码提交信息...');
-        console.log(data);
+        // console.log(data);
         const obj = this.commitsDrawer;
         // 利用local storage实现
         // 1. 如果查看了drawer就是badgeContent 0
