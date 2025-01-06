@@ -1,10 +1,14 @@
 <script>
 import {mapActions, mapState, mapWritableState} from "pinia";
 import {useAppStore} from "@/stores/app";
-import {version, useGoTo} from "vuetify";
+import {useMusicStore} from "@/stores/music";
+import {useGoTo, version} from "vuetify";
+
+import MusicBox from "@/components/music/MusicBox.vue";
 
 export default {
   name: "ShadowBlogApp",
+  components: {MusicBox},
   setup() {
     const goTo = useGoTo();
     return {
@@ -28,6 +32,11 @@ export default {
     }
     if (localStorage.getItem('preCommitsSize') == null) {
       localStorage.setItem('preCommitsSize', 0);
+    }
+    if (localStorage.getItem('selected_theme') == null) {
+      localStorage.setItem('selected_theme', 'simpleTheme');
+    } else {
+      this.toggleThemeByName(localStorage.getItem('selected_theme'));
     }
   },
   beforeMount() {
@@ -57,6 +66,7 @@ export default {
     },
     showSearchBox: false,
     showDrawer: false,
+    showMusicBox: false,
     items: Array.from({length: 50}, (k, v) => v + 1),
   }),
   computed: {
@@ -64,6 +74,9 @@ export default {
     ...mapWritableState(useAppStore, [
       'appSnackBar', 'appLaunchOverlay', 'startAppBarTransition', 'showWelcomeBanner', 'commitsDrawer',
     ]),
+    fabAttachClassByBreakpoint() {
+      return this.$vuetify.display.xs && this.showMusicBox ? 'goto-top-fab' : '';
+    },
   },
   methods: {
     ...mapActions(useAppStore, ['onShowCommitsDrawer', 'loadShadowBlogCommits']),
@@ -88,7 +101,16 @@ export default {
     },
     async toggleThemeByName(themeName) {
       const theme = this.$vuetify.theme;
+      if (themeName === theme.name) return;
       theme.name = themeName;
+      // 记住主题的选择
+      localStorage.setItem('selected_theme', themeName);
+    },
+    changeIsShowMusicBox(val) {
+      return this.showMusicBox = val;
+    },
+    openOrCloseMusicBox() {
+      return this.showMusicBox = !this.showMusicBox;
     },
   },
   destroyed() {
@@ -272,6 +294,7 @@ export default {
               <v-menu
                 v-else
                 open-on-hover
+                :close-on-content-click="false"
               >
                 <template v-slot:activator="{props}">
                   <div class="hidden-sm-and-down" v-bind="props">
@@ -476,6 +499,7 @@ export default {
 
     <!--页脚开始 -->
     <v-footer
+      id="app-footer"
       class="public-transition"
       color="rgba(var(--v-theme-surface) , .8)"
       app
@@ -517,6 +541,10 @@ export default {
     </v-footer>
     <!--页脚结束 -->
 
+    <!--  音乐盒子开始  -->
+    <music-box :showMusicBox="showMusicBox" @visible-change="changeIsShowMusicBox"/>
+    <!--  音乐盒子结束  -->
+
     <!--  工具Fab 开始 -->
     <v-overlay
       v-model="showToolBoxOverlay"
@@ -538,9 +566,9 @@ export default {
           border
           @click.stop
         >
-            <v-card-item>
-                <v-divider color="primary"/>
-            </v-card-item>
+          <v-card-item>
+            <v-divider color="primary"/>
+          </v-card-item>
           <v-card-subtitle># 主题</v-card-subtitle>
           <v-card-item>
             <v-row>
@@ -564,9 +592,9 @@ export default {
               </v-col>
             </v-row>
           </v-card-item>
-            <v-card-item>
-                <v-divider color="primary"/>
-            </v-card-item>
+          <v-card-item>
+            <v-divider color="primary"/>
+          </v-card-item>
           <v-card-subtitle># 运行环境</v-card-subtitle>
           <v-card-item>
             <v-expansion-panels
@@ -705,6 +733,13 @@ export default {
         <v-btn
           key="3"
           color="primary"
+          icon="mdi-music-box"
+          v-tooltip="{text: '来首Music(建设中...)'}"
+          @click="openOrCloseMusicBox"
+        />
+        <v-btn
+          key="5"
+          color="primary"
           icon="mdi-wrench"
           v-tooltip="{text: '更多功能正在加入...'}"
         />
@@ -719,16 +754,21 @@ export default {
       color="primary"
       icon="mdi-arrow-up"
       variant="tonal"
-      location="bottom end"
+      location="bottom"
       order="-1"
       app
       appear
+      :class="fabAttachClassByBreakpoint"
     />
   </v-app>
 </template>
 
 <style lang="scss">
 @import '@/styles/main';
+
+.goto-top-fab {
+  margin-bottom: 75px;
+}
 
 // 预置前置变量(保证不暴红) 框架进行替换
 :root {
@@ -739,7 +779,7 @@ export default {
 * {
   scrollbar-width: thin;
   // scss 中使用变量就可以分开写
-  scrollbar-color: rgba($scrollbar-color-frontend, 1) rgba($scrollbar-color-backend, .4);
+  scrollbar-color: rgba($scrollbar-color-frontend, 1) rgba($scrollbar-color-backend, .1);
 }
 
 .public-transition > * {

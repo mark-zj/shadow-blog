@@ -8,7 +8,7 @@ const api = {
     },
     getImage() {
       return axios.get('', {
-        baseURL:'',
+        baseURL: '',
         responseType: 'blob',
       });
       //.then(response => {
@@ -18,7 +18,19 @@ const api = {
       //       }).catch(error => {
       //         console.error('获取Banner失败:', error);
       //       });
-    }
+    },
+    getMusicList() {
+      return axios.get(path.App.musicList(), {baseURL: '', responseType: "json"});
+    },
+    getLyricsFileContent(url) {
+      return axios.get(path.App.lyricsFile(url), {baseURL: '', responseType: "text"});
+    },
+    getMusicFileContent(url) {
+      return axios.get(path.App.musicFile(url), {
+        baseURL: '',
+        responseType: 'blob',
+      });
+    },
   }
 };
 

@@ -1,0 +1,44 @@
+{
+  "total_pages": 1,
+  "page": 1,
+  "page_size": 5,
+  "message": "success",
+  "timestamp": 0,
+  "data": [
+    {
+      "id": 0,
+      "name": "Sugar",
+      "singer": "Maroon 5",
+      "src_url": "Maroon 5 - Sugar.flac",
+      "lyric_url": null
+    },
+    {
+      "id": 1,
+      "name": "Try",
+      "singer": "Marlisa",
+      "src_url": "Marlisa - Try.mp3",
+      "lyric_url": "Marlisa - Try.lrc"
+    },
+    {
+      "id": 2,
+      "name": "Solo Dance",
+      "singer": "Martin Jensen",
+      "src_url": "Martin Jensen - Solo Dance.flac",
+      "lyric_url": "Martin Jensen - Solo Dance.lrc"
+    },
+    {
+      "id": 3,
+      "name": "One Day",
+      "singer": "MatisYahu",
+      "src_url": "MatisYahu - One Day.flac",
+      "lyric_url": "MatisYahu - One Day.lrc"
+    },
+    {
+      "id": 4,
+      "name": "One Day",
+      "singer": "MatisYahu",
+      "src_url": "Hawk Nelson - Sold Out.flac",
+      "lyric_url": "Hawk Nelson - Sold Out.lrc"
+    }
+  ]
+}
