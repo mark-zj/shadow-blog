@@ -91,6 +91,8 @@ export default {
     },
     // 激活的歌词项的id
     activeLyricItemId: 'lyric-item-0',
+    interruptTimeoutId: null,
+    interruptLyricScroll: false,
     // 以下属性可能移除
     tempLyric: {
       // 样式中移除的歌词
@@ -173,7 +175,7 @@ export default {
           // alert(reason);
           console.log('audio 播放失败 !', reason);
         });
-      }catch (e) {
+      } catch (e) {
         console.log(e);
       }
     },
@@ -185,13 +187,13 @@ export default {
     },
     // 实际切歌逻辑
     async currentPlayIndex(newIndex) {
-      if(this.showLyricsPanel) this.showLyricsLoadingOverlay = true;
-      const {id, name, singer,src_url, lyric_url} = this.musicList.at(newIndex);
-      this.musicBeingPlayed = {id,name,singer};
+      if (this.showLyricsPanel) this.showLyricsLoadingOverlay = true;
+      const {id, name, singer, src_url, lyric_url} = this.musicList.at(newIndex);
+      this.musicBeingPlayed = {id, name, singer};
       this.musicBeingPlayed['src'] = await this.loadMusicFileContentAsURL(src_url);
       const cache = this.getParsedLyricFromCacheById(id);
       if (cache === null) {
-        const lyricOriginContent =  lyric_url == null ? '' : await this.loadLyricsFileContentByURL(lyric_url);
+        const lyricOriginContent = lyric_url == null ? '' : await this.loadLyricsFileContentByURL(lyric_url);
         this.musicBeingPlayed['lyrics'] = lyricOriginContent;
         this.parseLyricsToArray({id, name, singer, lyrics: lyricOriginContent}).then(value => {
           this.currentParsedLyrics = value;
@@ -202,12 +204,13 @@ export default {
         });
         return;
       }
+      // todo this.musicBeingPlayed['lyrics'] 需要赋值
       this.currentParsedLyrics = cache;
       this.showLyricsLoadingOverlay = false;
     },
   },
   methods: {
-    ...mapActions(useMusicStore, ['loadMusicList','loadLyricsFileContentByURL','loadMusicFileContentAsURL']),
+    ...mapActions(useMusicStore, ['loadMusicList', 'loadLyricsFileContentByURL', 'loadMusicFileContentAsURL']),
     getMusicFileHrefFromAssets(fileName, typeName) {
       return new URL(`../../assets/music/${fileName}.${typeName}`, import.meta.url).href;
     },
@@ -491,19 +494,12 @@ export default {
      */
     async activateTheLyricsStyle_() {
       try {
-        // if (!this.lyricsParsed) return;
         this.currentParsedLyrics.data.forEach(({id, time}) => {
           if (this.currentTime >= time) {
             this.activeLyricItemId = id;
-            // var htmlElement = document.getElementById(this.activeLyricItemId);
-            // var clientRect = htmlElement.getClientRects()[0];
-            // this.lyricItem.height = clientRect.height;
-            // this.lyricItem.width = clientRect.width;
-            // var elementById = document.getElementById('lyrics-container');
-            // this.lyricItem.old -= this.lyricItem.height;
-            // elementById.style.transform = `translateY(${this.lyricItem.old}px)`;
-            //todo 增加一个中断函数
-            document.getElementById(id).scrollIntoView({behavior: "smooth", block: 'center'});
+            if (this.interruptLyricScroll) return;
+            const element = document.getElementById(id);
+            element.scrollIntoView({behavior: "smooth", block: 'center'});
           }
         });
       } catch (e) {
@@ -511,6 +507,31 @@ export default {
         return -1;
       }
       return 0;
+    },
+
+    debounce(func, delay) {
+      let timeout;
+      return function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, arguments), delay);
+      };
+    },
+
+    /**
+     * 作用于鼠标滚动的事件，用于中断程序滚动事件
+     * @param e wheelEvent
+     */
+    onWheelLyricsScroll(e) {
+      const element = document.getElementById('lyrics-container');
+      element.scrollTo({
+        top: element.scrollTop + e.deltaY * 1.5,
+        behavior: 'smooth'
+      });
+      if (this.interruptTimeoutId != null) clearTimeout(this.interruptTimeoutId);
+      this.interruptLyricScroll = true;
+      this.interruptTimeoutId = setTimeout(() => {
+        this.interruptLyricScroll = false;
+      }, 2000);
     },
 
     /**
@@ -652,8 +673,11 @@ export default {
         <!--    歌词信息结束    -->
 
         <!--    歌词 item 开始    -->
-        <v-container class="h-75 overflow-y-hidden border-t">
-          <v-item-group id="lyrics-container" selected-class="text-primary">
+        <v-container
+          id="lyrics-container"
+          class="h-75 overflow-y-hidden border-t"
+          @wheel.prevent.stop="onWheelLyricsScroll">
+          <v-item-group id="lyrics-item-group" selected-class="text-primary">
             <template v-if="currentParsedLyrics.data.length !== 0">
               <template v-for="({id,time,displayTime,content}) in currentParsedLyrics.data">
                 <v-item #default="{ isSelected, selectedClass,toggle }">
@@ -814,7 +838,7 @@ export default {
   box-shadow: 0 11px 15px -7px inset rgb(var(--v-theme-primary)) !important;
 }
 
-#lyrics-container {
+#lyrics-item-group {
   transform: translateY(250px);
   //margin-top: 100px;
 }
