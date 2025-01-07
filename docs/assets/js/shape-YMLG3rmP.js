@@ -1,0 +1,1 @@
+import{_ as e,m as a,u as t,o as s,c as p}from"./index-CcNwYRi0.js";const o={name:"shape",mounted(){this.appLaunchOverlay=!1},computed:{...a(t,["appLaunchOverlay"])}};function c(n,r,u,l,m,_){return s(),p("div",null,"shape")}const f=e(o,[["render",c]]);export{f as default};
