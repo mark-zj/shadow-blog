@@ -13,8 +13,8 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base:'/',//用于本地http-server测试
-  // base:'/shadow-blog',
+  // base:'/',//用于本地http-server测试
+  base:'/shadow-blog',
   mode:'development',
   publicDir:'public',
   build:{
