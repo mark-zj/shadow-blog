@@ -15,7 +15,6 @@ export const useMusicStore = defineStore('music', {
     },
     loadLyricsFileContentByURL(url) {
       return api.App.getLyricsFileContent(url).then(value => {
-        // console.log(value);
         return value;
       }).catch(reason => {
         console.error(reason);

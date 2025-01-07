@@ -188,11 +188,11 @@ export default {
       if(this.showLyricsPanel) this.showLyricsLoadingOverlay = true;
       const {id, name, singer,src_url, lyric_url} = this.musicList.at(newIndex);
       this.musicBeingPlayed = {id,name,singer};
-      const lyricOriginContent =  lyric_url == null ? '' : await this.loadLyricsFileContentByURL(lyric_url);
-      this.musicBeingPlayed['lyrics'] = lyricOriginContent;
       this.musicBeingPlayed['src'] = await this.loadMusicFileContentAsURL(src_url);
       const cache = this.getParsedLyricFromCacheById(id);
       if (cache === null) {
+        const lyricOriginContent =  lyric_url == null ? '' : await this.loadLyricsFileContentByURL(lyric_url);
+        this.musicBeingPlayed['lyrics'] = lyricOriginContent;
         this.parseLyricsToArray({id, name, singer, lyrics: lyricOriginContent}).then(value => {
           this.currentParsedLyrics = value;
           this.parsedLyricsArray.push(value);

@@ -13,7 +13,8 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base:'/shadow-blog',
+  base:'/',//用于本地http-server测试
+  // base:'/shadow-blog',
   mode:'development',
   publicDir:'public',
   build:{
@@ -40,6 +41,17 @@ export default defineConfig({
           if([".ttf",".eot","woff2","woff"].some((item) => assetInfo.name.endsWith(item))) {
             return `${baseUrl}/fonts/[name]/[hash].[ext]`;
           }
+          /////// music
+          if([".flac",".mp3",].some((item) => assetInfo.name.endsWith(item))) {
+            return `${baseUrl}/music/[name].[ext]`;
+          }
+          // if([".lrc",].some((item) => assetInfo.name.endsWith(item))) {
+          //   return `${baseUrl}/music/lyric/[name].[ext]`;
+          // }
+          // if(assetInfo.name === 'meta.json') {
+          //   return `${baseUrl}/music/config/[name].[ext]`;
+          // }
+          ///////
           return `${baseUrl}/[name]-[hash].[ext]`;
         },
         // manualChunks(id) {
