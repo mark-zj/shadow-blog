@@ -4,7 +4,7 @@ export default {
   mounted() {
     this.getAvatar();
   },
-  data:() =>({
+  data: () => ({
     personalInfoLoading: false,
   }),
   methods: {
@@ -19,16 +19,15 @@ export default {
 </script>
 
 <template>
-  <v-card color="rgba(var(--v-theme-primary) , .05)"
-          elevation="0"
-  >
+  <v-card
+    color="rgba(var(--v-theme-primary) , .05)"
+    elevation="0">
     <v-card-item>
       <v-row class="py-3">
         <v-col class="text-center pa-0">
           <v-avatar
             size="70"
-            border
-          >
+            border>
             <template v-slot:default>
               <!--
                 @/assets/avatar.jpg
@@ -87,10 +86,11 @@ export default {
       </div>
     </v-card-item>
     <v-card-item>
-      <v-btn text="关于我"
-             color="primary"
-             variant="outlined"
-             block
+      <v-btn
+        text="关于我"
+        color="primary"
+        variant="outlined"
+        block
       />
     </v-card-item>
   </v-card>

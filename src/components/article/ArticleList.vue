@@ -1,5 +1,6 @@
 <script>
-import {useArticleListStore} from "@/stores/article_list";
+import {mapState} from "pinia";
+import {useArticleStore} from "@/stores/article";
 import ArticleListCard from "@/components/article/ArticleListCard.vue";
 
 export default {
@@ -12,27 +13,25 @@ export default {
     },
   },
   setup() {
-    const useArticleList = useArticleListStore();
-    return {
-      useArticleList,
-    }
+    return {}
   },
   mounted() {
     this.getArticleListByPage_(1);
   },
-  data() {
-    return {
-      articleLoading: false,
-    }
+  data: () => ({
+    articleLoading: false,
+  }),
+  computed: {
+    ...mapState(useArticleStore, ['getArticleList','getArticleListByPage','getTotalPages','getPage']),
   },
   methods: {
     getArticleListByPage_(page) {
       this.articleLoading = true;
       // api 加载模拟
-      setTimeout(()=> {
-        this.useArticleList.getArticleListByPage(page);
+      setTimeout(() => {
+        this.getArticleListByPage(page);
         this.articleLoading = false;
-      },2000);
+      }, 2000);
     },
   },
 }
@@ -41,7 +40,7 @@ export default {
 <template>
   <v-container fluid class="pa-5">
     <!--        文章start          -->
-    <template v-for="(article, index) in useArticleList.getArticleList">
+    <template v-for="(article, index) in getArticleList" :key="article.id">
       <v-row :class="index % 2 === 0 ? 'flex-row-reverse article-row':'article-row'">
         <v-col class="pa-0 d-flex align-center article-col" cols="12" sm="5" md="5" xl="5">
           <div class="article-banner-parent overflow-hidden w-100">
@@ -56,14 +55,12 @@ export default {
               :src="`https://picsum.photos/seed/${Math.random() * 100}/360/260?random=1`"
               referrerpolicy="origin"
               aspect-ratio="16/9"
-              cover
-            >
+              cover>
               <template v-slot:placeholder>
                 <v-row
                   align="center"
                   class="fill-height ma-0"
-                  justify="center"
-                >
+                  justify="center">
                   <v-progress-circular color="primary" indeterminate/>
                 </v-row>
               </template>
@@ -84,8 +81,7 @@ export default {
             class="gr-sm-1 gr-md-2 gr-lg-3 gr-xl-8 gr-xxl-11"
             :loading="articleLoading"
             color="transparent"
-            type="heading ,subtitle,text,text@3,"
-          >
+            type="heading ,subtitle,text,text@3,">
             <article-list-card :article="article"/>
           </v-skeleton-loader>
         </v-col>
@@ -103,15 +99,15 @@ export default {
     <v-col cols="12" md="6">
       <v-pagination
         v-if="showPagination"
-        v-model="useArticleList.page"
+        v-model="page"
+        :length="getTotalPages"
         @update:modelValue="getArticleListByPage_"
-        :length="useArticleList.getTotalPages"
         variant="flat"
         active-color="primary"
         density="comfortable"
         next-icon="mdi-menu-right"
         prev-icon="mdi-menu-left"
-        />
+      />
     </v-col>
   </v-row>
 </template>

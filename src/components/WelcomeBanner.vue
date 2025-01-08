@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     ...mapActions(useAppStore, ['onShowFab', 'welcomeBannerLoadstart', 'welcomeBannerLoadend']),
-    ...mapActions(useAppStore, ['showCommitsDrawer','onShowCommitsDrawer']),
+    ...mapActions(useAppStore, ['showCommitsDrawer', 'onShowCommitsDrawer']),
   },
 }
 </script>
@@ -25,8 +25,7 @@ export default {
 <template>
   <v-parallax
     :class="{'h-screen': $vuetify.theme.name === 'shadowTheme','h-0': true}"
-    v-intersect="onShowFab"
-  >
+    v-intersect="onShowFab">
     <transition name="public-fade">
       <v-img
         v-show="showWelcomeBanner"
@@ -36,8 +35,7 @@ export default {
         src="@/assets/banner-1.jpg"
         width="100%"
         height="100vh"
-        cover
-      >
+        cover>
         <div class="d-flex flex-column fill-height justify-space-around align-center text-white font-weight-bold">
           <div class="text-h2 text-md-h1 font-weight-thin mb-4">
             <div class="d-flex gc-3">
@@ -47,10 +45,8 @@ export default {
                 </div>
               </transition>
               <transition name="banner-title-left-in">
-                <div
-                  v-if="startWelcomeTransition"
-                  class=" text-md-end font-weight-bold text-decoration-overline"
-                >Blog
+                <div v-if="startWelcomeTransition" class=" text-md-end font-weight-bold text-decoration-overline">
+                  Blog
                 </div>
               </transition>
             </div>
@@ -61,23 +57,20 @@ export default {
                 <v-badge
                   color="red"
                   :content="commitsDrawer.badgeContent"
-                  floating
-                >
+                  floating>
                   <span
                     class="text-subtitle-1 text-capitalize cursor-pointer"
                     @click="showCommitsDrawer"
-                    v-tooltip="{text:'查看更新日志',location:'left'}"
-                  >
-                  💦 beta v0.0.1
-                </span>
+                    v-tooltip="{text:'查看更新日志',location:'left'}">
+                    💦 beta v0.0.1
+                  </span>
                 </v-badge>
               </p>
             </transition>
             <transition name="public-fade">
               <div
                 v-if="startWelcomeTransition"
-                class="pt-10 text-subtitle-1 font-weight-bold"
-              >
+                class="pt-10 text-subtitle-1 font-weight-bold">
                 😎思想有多远，😁宇宙就有多大
               </div>
             </transition>

@@ -31,8 +31,7 @@ export default {
     class="d-flex flex-column gr-sm-1 gr-md-2 gr-lg-3 gr-xl-8 gr-xxl-11"
     color="transparent"
     elevation="0"
-    :loading="openArticleCardLoading"
-  >
+    :loading="openArticleCardLoading">
     <template v-slot:loader="{isActive}">
       <v-progress-linear
         :active="isActive"
@@ -45,21 +44,23 @@ export default {
     <template v-slot:title>
       <div class="d-flex flex-row align-center justify-space-between">
         <h3>
-          <v-icon v-if="article.topMounted"
-                  class="pushpin"
-                  color="primary"
-                  size="small"
-                  icon="mdi-pin"
+          <v-icon
+            v-if="article.topMounted"
+            class="pushpin"
+            color="primary"
+            size="small"
+            icon="mdi-pin"
           />
           <span v-else class="px-1">#</span>
           <span>{{ article.title }}</span>
         </h3>
-        <v-icon class="article-arrow-expand"
-                icon="mdi-arrow-expand-all"
-                size="25"
-                @click="openArticleCard"
-                :disabled="openArticleCardDisabled"
-                v-tooltip="{text: '查看文章'}"
+        <v-icon
+          class="article-arrow-expand"
+          icon="mdi-arrow-expand-all"
+          size="25"
+          @click="openArticleCard"
+          :disabled="openArticleCardDisabled"
+          v-tooltip="{text: '查看文章'}"
         />
       </div>
     </template>
@@ -71,12 +72,12 @@ export default {
     </v-card-subtitle>
     <v-card-subtitle>
       <v-chip-group column>
-        <v-chip v-for="(tag, index) in article.tags"
-                :text="tag.name"
-                :key="tag.name + index"
-                v-tooltip="{text: `${tag.description}`,location:'bottom'}"
-                tile
-        >
+        <v-chip
+          v-for="(tag, index) in article.tags"
+          :text="tag.name"
+          :key="`${tag.name}-${index}`"
+          v-tooltip="{text: `${tag.description}`,location:'bottom'}"
+          tile>
           <template v-slot:prepend>
             <v-icon :color="tag.color" icon="mdi-tag"/>
           </template>

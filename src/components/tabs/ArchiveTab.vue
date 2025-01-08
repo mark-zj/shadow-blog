@@ -22,17 +22,15 @@ export default {
         variant="tonal"
         nav
         slim
-        lines
-      >
+        lines>
         <v-list-item
           v-for="(index) in 5"
-          :key="index"
+          :key="`archive-${index}`"
           :title="'2024年1月' + index + '日'"
           :subtitle="index + '篇文章'"
           class="zip-nav-hover"
           color="transparent"
-          link
-        >
+          link>
           <template v-slot:append>
             <v-icon icon="mdi-arrow-right" size="20"/>
           </template>

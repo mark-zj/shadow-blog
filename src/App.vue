@@ -126,8 +126,7 @@ export default {
     <v-overlay
       :model-value="appLaunchOverlay"
       class="align-center justify-center text-center"
-      persistent
-    >
+      persistent>
       <div>
         <v-progress-circular color="primary" :indeterminate="appLaunchOverlay"/>
         <span class="pa-5 font-weight-bold text-subtitle-2">正在启动...</span>
@@ -143,8 +142,7 @@ export default {
       variant="tonal"
       v-model="appSnackBar.open"
       :timeout="appSnackBar.timeout"
-      transition="scale-transition"
-    >
+      transition="scale-transition">
       <template #text>
         <div class="d-inline-flex align-center gc-2">
           <v-icon icon="mdi-information-box"/>
@@ -163,14 +161,12 @@ export default {
       scroll-behavior="fade-image inverted"
       scroll-threshold="2000"
       density="comfortable"
-      elevation="0"
-    >
+      elevation="0">
       <v-app-bar-title #text>
         <transition name="public-fade">
           <span
             class="app-bar-title d-inline-block"
-            v-show="startAppBarTransition"
-          >
+            v-show="startAppBarTransition">
             Shadow Blog
           </span>
         </transition>
@@ -183,17 +179,14 @@ export default {
             v-model="showSearchBox"
             content-class="justify-space-evenly"
             persistent
-            fullscreen
-          >
+            fullscreen>
             <v-container
               max-width="500px"
-              fluid
-            >
+              fluid>
               <v-row>
                 <v-col
                   class="d-flex align-center justify-center"
-                  cols="12"
-                >
+                  cols="12">
                   <v-text-field
                     variant="solo"
                     min-width="300px"
@@ -202,8 +195,7 @@ export default {
                     color="primary"
                     density="comfortable"
                     hide-details
-                    hide-spin-buttons
-                  >
+                    hide-spin-buttons>
                     <template v-slot:prepend-inner>
                       <v-icon icon="mdi-file-find"/>
                     </template>
@@ -223,8 +215,7 @@ export default {
                   <v-sheet
                     class="pa-5 border-opacity-75"
                     color="rgba(var(--v-theme-surface) , .8)"
-                    border
-                  >
+                    border>
                     <div class="v-card-title">
                       <v-icon icon="mdi-receipt-clock"/>
                       <span class="font-weight-bold">最近</span>
@@ -235,13 +226,10 @@ export default {
                       @load="load"
                       color="primary"
                       empty-text="没有更多了..."
-                      border
-                    >
-                      <template v-for="(index) in items" :key="index">
-                        <div class="v-list-item">
-                          Item number {{ index }}
-                        </div>
-                      </template>
+                      border>
+                      <div class="v-list-item" v-for="(index) in items" :key="index">
+                        Item number {{ index }}
+                      </div>
                     </v-infinite-scroll>
                   </v-sheet>
                 </v-col>
@@ -257,13 +245,11 @@ export default {
         <transition name="app-nav">
           <div
             v-if="startAppBarTransition"
-            class="d-inline-flex align-center"
-          >
+            class="d-inline-flex align-center">
             <!--     搜索框     -->
             <div
               class="app-bar-nav-item"
-              @click="showSearchBox = !showSearchBox"
-            >
+              @click="showSearchBox = !showSearchBox">
               <div class="d-inline-flex align-center gc-1">
                 <v-icon size="small" icon="mdi-magnify"/>
                 <span class="hidden-sm-and-down">搜索</span>
@@ -280,12 +266,11 @@ export default {
             <!--     小屏幕抽屉开关结束     -->
 
             <!--     大屏幕导航选项开始     -->
-            <template v-for="navItem in navItems">
+            <template v-for="navItem in navItems" :key="navItem.title">
               <div
                 v-if="navItem.childNavItems === undefined"
                 class="hidden-sm-and-down"
-                @click="goToRoute(navItem.path)"
-              >
+                @click="goToRoute(navItem.path)">
                 <div class="app-bar-nav-item d-inline-flex align-center gc-1">
                   <v-icon size="small" :icon="navItem.icon"/>
                   <span>{{ navItem.title }}</span>
@@ -294,15 +279,15 @@ export default {
               <v-menu
                 v-else
                 open-on-hover
-                :close-on-content-click="false"
-              >
+                :close-on-content-click="false">
                 <template v-slot:activator="{props}">
                   <div class="hidden-sm-and-down" v-bind="props">
                     <div class="app-bar-nav-item d-inline-flex align-center gc-1">
                       <v-icon size="small" :icon="navItem.icon"/>
                       <span>{{ navItem.title }}</span>
                       <v-icon class="pl-1"
-                              :icon="props['aria-expanded'] === 'false' ?'mdi-chevron-up':'mdi-chevron-down'"/>
+                              :icon="props['aria-expanded'] === 'false' ?'mdi-chevron-up':'mdi-chevron-down'"
+                      />
                     </div>
                   </div>
                 </template>
@@ -312,16 +297,15 @@ export default {
                   color="primary"
                   nav
                   slim
-                  lines
-                >
+                  lines>
                   <v-list-item
-                    v-for="childNavItem in navItem.childNavItems"
-                    :title="childNavItem.title"
-                    :value="childNavItem.title"
-                    :to="{path: childNavItem.path}"
-                  >
+                    v-for="({title,path,icon},index) in navItem.childNavItems"
+                    :key="`${title}-${index}`"
+                    :title="title"
+                    :value="title"
+                    :to="{path: path}">
                     <template v-slot:prepend>
-                      <v-icon size="small" :icon="childNavItem.icon"/>
+                      <v-icon size="small" :icon="icon"/>
                     </template>
                   </v-list-item>
                 </v-list>
@@ -381,13 +365,12 @@ export default {
           color="primary"
           nav
           slim
-          lines
-        >
+          lines>
           <v-list-subheader
             class="text-caption font-weight-bold"
             title="成为你的影子 ~"
           />
-          <template v-for="navItem in navItems">
+          <template v-for="navItem in navItems" :key="navItem.title">
             <v-list-item
               v-if="navItem.childNavItems === undefined"
               :title="navItem.title"
@@ -397,8 +380,7 @@ export default {
             />
             <v-list-group
               v-else
-              color="primary"
-            >
+              color="primary">
               <template v-slot:activator="{ props }">
                 <v-list-item
                   v-bind="props"
@@ -412,14 +394,14 @@ export default {
                 color="primary"
                 nav
                 slim
-                lines
-              >
+                lines>
                 <v-list-item
-                  v-for="childNavItem in navItem.childNavItems"
-                  :prepend-icon="childNavItem.icon"
-                  :title="childNavItem.title"
-                  :value="childNavItem.title"
-                  :to="childNavItem.path"
+                  v-for="({title,path,icon},index) in navItem.childNavItems"
+                  :key="`${title}-${index}`"
+                  :prepend-icon="icon"
+                  :title="title"
+                  :value="title"
+                  :to="path"
                 />
               </v-list>
             </v-list-group>

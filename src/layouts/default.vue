@@ -43,10 +43,10 @@ export default {
 </script>
 
 <template>
-  <v-container id="default-top-container"
-               class="pa-0 ma-0 public-transition"
-               fluid
-  >
+  <v-container
+    id="default-top-container"
+    class="pa-0 ma-0 public-transition"
+    fluid>
     <!--     上半段    first-half
           主页欢迎图
           文章banner
@@ -69,13 +69,11 @@ export default {
       <v-container
         v-if="currentPageNot('notfound')"
         class="pt-10"
-        id="goto-target-container"
-      >
+        id="goto-target-container">
         <v-row justify="space-evenly">
           <!--  文章 标签 分类    -->
           <v-col class="d-flex flex-column"
-                 cols="12" sm="12" md="12" lg="9" xl="8" xxl="7"
-          >
+                 cols="12" sm="12" md="12" lg="9" xl="8" xxl="7">
             <router-view v-slot="{ Component }">
               <keep-alive>
                 <component :is="Component"/>
@@ -86,7 +84,7 @@ export default {
           <v-col cols="12" sm="12" md="12" lg="3" xl="3" xxl="2">
             <v-row justify="space-between">
               <!--      个人   personal    -->
-              <v-col cols="12" >
+              <v-col cols="12">
                 <personal-tab/>
               </v-col>
               <!--       公告   notice    -->

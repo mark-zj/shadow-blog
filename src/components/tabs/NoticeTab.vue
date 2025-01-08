@@ -31,10 +31,10 @@ export default {
 
 <template>
   <!-- public-transition 在主题切换时导致有速度有变化 -->
-  <v-card class="pa-2"
-          color="rgba(var(--v-theme-surface) , .8)"
-          :loading="noticeInfoLoading"
-  >
+  <v-card
+    class="pa-2"
+    color="rgba(var(--v-theme-surface) , .8)"
+    :loading="noticeInfoLoading">
     <template v-slot:loader="{isActive}">
       <v-progress-linear
         :active="isActive"

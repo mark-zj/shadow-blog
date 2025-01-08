@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 
-export const useArticleListStore = defineStore('article_list', {
+export const useArticleStore = defineStore('article', {
   state: () => ({
     // 总页数
     totalPages: 100,

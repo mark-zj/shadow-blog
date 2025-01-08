@@ -789,8 +789,7 @@ export default {
               track-size="3"
               hide-details
               hide-spin-buttons
-              @update:model-value="onSetVolume"
-            >
+              @update:model-value="onSetVolume">
               <template #prepend>
                 <v-icon class="opacity-100">
                   {{ getSliderPrependIconByVolume }}

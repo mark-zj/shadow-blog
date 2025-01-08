@@ -24,7 +24,7 @@ export default {
       <v-chip-group column>
         <v-chip
           v-for="(item,index) in tags"
-          :key="index"
+          :key="`tag-${index}`"
           :text="item"
           class="mr-1 chip-tag"
           density="comfortable"
