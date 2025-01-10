@@ -70,10 +70,10 @@ export default {
         v-if="currentPageNot('notfound')"
         class="pt-10"
         id="goto-target-container">
-        <v-row justify="space-evenly">
+        <v-row justify="space-around">
           <!--  文章 标签 分类    -->
-          <v-col class="d-flex flex-column"
-                 cols="12" sm="12" md="12" lg="9" xl="8" xxl="7">
+          <v-col
+            cols="12" sm="12" md="12" lg="8" xl="7" xxl="5" >
             <router-view v-slot="{ Component }">
               <keep-alive>
                 <component :is="Component"/>
@@ -81,35 +81,37 @@ export default {
             </router-view>
           </v-col>
           <!--     选项卡   tabs    -->
-          <v-col cols="12" sm="12" md="12" lg="3" xl="3" xxl="2">
+          <v-col
+            offset="0" offset-md="0" offset-xxl="0" offset-sm="0" offset-xl="0" offset-lg="1"
+            cols="12" sm="12" md="12" lg="3" xl="2">
             <v-row justify="space-between">
               <!--      个人   personal    -->
-              <v-col cols="12">
+              <v-col cols="12" sm="6" md="6" lg="12">
                 <personal-tab/>
               </v-col>
               <!--       公告   notice    -->
-              <v-col cols="12">
+              <v-col cols="12" sm="6" md="6" lg="12" align-self="center">
                 <notice-tab/>
               </v-col>
               <!--        最新文章     Latest articles   -->
-              <v-col cols="12">
+              <v-col cols="12" sm="6" md="6" lg="12">
                 <latest-article-tab/>
               </v-col>
               <!--       标签    显示前十个 tag  -->
               <v-scale-transition>
-                <v-col cols="12" v-if="currentPageNot('article')">
+                <v-col cols="12" sm="6" md="6" lg="12" v-if="currentPageNot('article')">
                   <tag-tab/>
                 </v-col>
               </v-scale-transition>
               <v-scale-transition>
                 <!--        归档   展示对应的时间线 archive  -->
-                <v-col cols="12" v-if="currentPageNot('article')">
+                <v-col cols="12" sm="6" md="6" lg="12" v-if="currentPageNot('article')">
                   <archive-tab/>
                 </v-col>
               </v-scale-transition>
               <v-scale-transition>
                 <!--       网站资讯      website information -->
-                <v-col cols="12" v-if="currentPageNot('article')">
+                <v-col cols="12" sm="6" md="6" lg="12" v-if="currentPageNot('article')">
                   <website-information/>
                 </v-col>
               </v-scale-transition>
@@ -129,14 +131,6 @@ export default {
 
 .article-banner-parent {
   border-radius: 4px;
-}
-
-.article-row:hover > .article-col > .article-banner-parent > .article-banner {
-  transform: scale(1.1);
-}
-
-.article-row:hover > .article-col > .article-banner-parent > .article-skeleton > .article-banner {
-  transform: scale(1.1);
 }
 
 

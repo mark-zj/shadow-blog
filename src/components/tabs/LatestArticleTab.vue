@@ -61,5 +61,11 @@ export default {
 
 <style lang="css" scoped>
 
+.article-row:hover > .article-col > .article-banner-parent > .article-banner {
+  transform: scale(1.1);
+}
 
+.article-row:hover > .article-col > .article-banner-parent > .article-skeleton > .article-banner {
+  transform: scale(1.1);
+}
 </style>
