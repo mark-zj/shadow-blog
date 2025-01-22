@@ -187,6 +187,7 @@ export default {
     },
     // 实际切歌逻辑
     async currentPlayIndex(newIndex) {
+      this.play = false;
       if (this.showLyricsPanel) this.showLyricsLoadingOverlay = true;
       const {id, name, singer, src_url, lyric_url} = this.musicList.at(newIndex);
       this.musicBeingPlayed = {id, name, singer};
