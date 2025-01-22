@@ -328,7 +328,10 @@ export default {
       const audio = e.target;
       for (let i = 0; i < audio.buffered.length; i++) {
         const endTime = audio.buffered.end(audio.buffered.length - 1);
-        this.bufferedProgress = (endTime / this.duration) * 100;
+        // console.log(endTime,this.duration,audio.duration);
+        // 问题：使用this.duration属性并切歌时导致当前音乐的缓冲时间滞留在上一首的缓冲总时间
+        // 分析：框架渲染时，优先于onProgressAtAudio，导致数据为旧数据
+        this.bufferedProgress = (endTime / audio.duration) * 100;
       }
     },
 
@@ -503,7 +506,7 @@ export default {
           }
         });
       } catch (e) {
-        console.log(e);
+        // console.log(e);
         return -1;
       }
       return 0;
