@@ -138,7 +138,7 @@ export default {
     getActiveLyricItemStyle() {
       return (currentItem) => {
         // return currentItem === this.activeLyricItemId ? 'text-high-emphasis' : 'text-medium-emphasis';
-        return currentItem === this.activeLyricItemId ? 'text-primary lyric-active' : 'text-medium-emphasis';
+        return currentItem === this.activeLyricItemId ? 'text-primary lyric-content-active' : 'text-medium-emphasis';
       };
     },
     getPlayBtnDisable() {
@@ -473,6 +473,10 @@ export default {
       return result;
     },
 
+    removeTheBrackets(timeString) {
+      return timeString.substring(1, timeString.length - 1);
+    },
+
     /**
      * 解析时间
      * @param timeString
@@ -480,7 +484,7 @@ export default {
      */
     parseTimeStringToSeconds(timeString) {
       // 去括号[]
-      timeString = timeString.substring(1, timeString.length - 1);
+      timeString = this.removeTheBrackets(timeString);
       // 获取分段索引
       const index = timeString.search(':');
       // 获取分钟
@@ -685,34 +689,30 @@ export default {
               <template v-for="({id,time,displayTime,content}) in currentParsedLyrics.data">
                 <v-item #default="{ isSelected, selectedClass,toggle }">
                   <v-hover #default="{isHovering,props}">
-                    <v-card
-                      v-bind="props"
-                      color="transparent"
-                      class="music-box-lyric-card"
-                      :class="['d-flex align-center public-transition', selectedClass]"
-                      :id="id"
-                      @click="goToCurrentTimeByTime(toggle,time)">
-                      <template #subtitle>
-                        <span v-text="displayTime"/>
-                      </template>
-                      <div class="d-flex align-center gc-3">
-                        <div class="d-flex align-center">
-                          <v-scale-transition>
-                            <v-icon v-if="id === activeLyricItemId" color="primary"
-                                    icon="mdi-arrow-right-bold-outline"/>
-                          </v-scale-transition>
+                    <div class="position-relative my-3">
+                      <v-card
+                        v-bind="props"
+                        color="transparent"
+                        class="music-box-lyric-card"
+                        :class="['d-flex align-center justify-center', selectedClass]"
+                        :id="id"
+                        @click="goToCurrentTimeByTime(toggle,time)">
+                        <v-card-item class="lyric-content" :class="getActiveLyricItemStyle(id)" v-html="content"/>
+                      </v-card>
+                      <div
+                        v-bind="props"
+                        class="cursor-pointer position-absolute top-0 bottom-0 right-0">
+                        <div
+                          class="d-flex align-center justify-center h-100 text-subtitle-2 gc-1 px-5 text-primary lyric-hover"
+                          v-if="isHovering">
+                          <v-btn
+                            prepend-icon="mdi-play"
+                            variant="text"
+                            :text="removeTheBrackets(displayTime)"
+                            @click="goToCurrentTimeByTime(toggle,time)"/>
                         </div>
-                        <div :class="getActiveLyricItemStyle(id)" v-html="content"/>
                       </div>
-                      <template #actions>
-                        <v-scale-transition>
-                          <div v-if="isHovering && id !== activeLyricItemId" class="d-inline-flex gc-1">
-                            <v-icon color="primary" icon="mdi-arrow-left-bold-outline"/>
-                            {{ `${time}s` }}
-                          </div>
-                        </v-scale-transition>
-                      </template>
-                    </v-card>
+                    </div>
                   </v-hover>
                 </v-item>
               </template>
@@ -853,8 +853,24 @@ export default {
   box-shadow: none !important;
 }
 
-.lyric-active {
+.lyric-hover {
+  animation: displayTime ease-in-out .5s;
+}
+
+@keyframes displayTime {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.lyric-content {
+  transition: 1s;
+  transform: scale(.9);
+}
+.lyric-content-active {
   transform: scale(1.2);
-  margin-inline: 50px 0;
+  //margin-inline: 50px 0;
 }
 </style>
