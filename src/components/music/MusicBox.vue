@@ -23,7 +23,7 @@ export default {
     this.$nextTick(() => {
       const audio = this.$refs["internal-audio"];
       // 设置是否自动播放
-      audio.autoplay = this.autoplay;
+      // audio.autoplay = this.autoplay;
       // 设置默认音量
       audio.volume = this.deformattingVolume(this.volume);
     });
@@ -38,6 +38,7 @@ export default {
   },
   data: () => ({
     visible: false,
+    showMusicList: false,
     musicList: [],
     currentPlayIndex: null,
     // 正在播放的音乐
@@ -122,6 +123,9 @@ export default {
     },
     getLyricsBtnIconByIsShowLyricsPanel() {
       return this.showLyricsPanel ? 'mdi-alpha-l-box' : 'mdi-alpha-l-box-outline';
+    },
+    getMusicListMenuIconByIsShowMusicList() {
+      return this.showMusicList ? 'mdi-menu-close' : 'mdi-menu-open';
     },
     getPlayStatus() {
       return this.play ? 'play' : 'pause';
@@ -220,6 +224,9 @@ export default {
     },
     getMusicMetaHrefFromAssets() {
       return new URL(`../../assets/music/config/meta.json`, import.meta.url).href;
+    },
+    changeIsShowMusicList() {
+      this.showMusicList = !this.showMusicList;
     },
     //播放前一首
     playPrevMusic() {
@@ -736,6 +743,51 @@ export default {
     </v-expand-transition>
     <!--  歌词box结束  -->
 
+    <!--  歌曲列表开始  -->
+    <div class="position-relative">
+      <v-expand-x-transition>
+        <v-list
+          v-if="showMusicList"
+          class="position-absolute bottom-0 right-0"
+          bg-color="rgba(var(--v-theme-surface),.8)"
+          height="400px"
+          width="300px"
+          activatable>
+          <v-list-subheader sticky :title="`共计${musicList.length}首歌曲~`" />
+          <template  v-for="({id,name,singer},index) in musicList">
+            <v-hover #default="{props , isHovering}">
+              <v-list-item
+                class="py-2"
+                v-bind="props"
+                :title="name"
+                :subtitle="singer"
+                :active="musicList[currentPlayIndex].id === id"
+                active-color="primary"
+                lines="two"
+                :key="id"
+                @click="currentPlayIndex = index"
+                link>
+                <template #prepend>
+                  <div class="px-3 ">{{index}}</div>
+                </template>
+                <template #append>
+                  <div v-if="isHovering">
+                    <v-btn
+                      class="music-list-item-hover"
+                      :icon="this.play && currentPlayIndex === index ? 'mdi-pause' : 'mdi-play'"
+                      variant="text"
+                      @click="changePlayStatus"
+                    />
+                  </div>
+                </template>
+              </v-list-item>
+            </v-hover>
+          </template>
+        </v-list>
+      </v-expand-x-transition>
+    </div>
+    <!--  歌曲列表结束  -->
+
     <!--  操作台box开始  -->
     <v-sheet
       id="internal-music-box"
@@ -825,6 +877,13 @@ export default {
               @click="playNextMusic"
               :disabled="getPlayNextBtnDisable"
             />
+            <!--      音乐列表      -->
+            <v-btn
+              :icon="getMusicListMenuIconByIsShowMusicList"
+              :ripple="{class: 'text-primary'}"
+              variant="text"
+              @click="changeIsShowMusicList"
+            />
           </template>
           <!--   播放器按钮开始   -->
         </v-list-item>
@@ -855,6 +914,10 @@ export default {
 }
 
 .lyric-hover {
+  animation: displayTime ease-in-out .5s;
+}
+
+.music-list-item-hover {
   animation: displayTime ease-in-out .5s;
 }
 
