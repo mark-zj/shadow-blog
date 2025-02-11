@@ -207,6 +207,7 @@ export default {
     // 实际切歌逻辑
     async currentPlayIndex(newIndex) {
       this.play = false;
+      this.bufferedProgress = 0;
       if (this.showLyricsPanel) this.showLyricsLoadingOverlay = true;
       const {id, name, singer, src_url, lyric_url} = this.musicList.at(newIndex);
       this.musicBeingPlayed = {id, name, singer};
@@ -793,6 +794,7 @@ export default {
     <div class="position-relative">
       <v-expand-x-transition>
         <v-list
+          style="z-index: 2021"
           v-if="showMusicList"
           class="position-absolute bottom-0 right-0"
           bg-color="rgba(var(--v-theme-surface),.8)"
