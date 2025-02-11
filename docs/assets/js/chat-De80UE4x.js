@@ -1,0 +1,1 @@
+import{_ as a,m as e,u as t,o as c,c as o}from"./index-DQni56jY.js";const s={name:"chat",mounted(){this.appLaunchOverlay=!1},computed:{...e(t,["appLaunchOverlay"])}};function n(p,r,u,l,m,_){return c(),o("div",null,"chat")}const f=a(s,[["render",n]]);export{f as default};
