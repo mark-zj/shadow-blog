@@ -749,7 +749,7 @@ export default {
 @import '@/styles/main';
 
 .goto-top-fab {
-  margin-bottom: 75px;
+  margin-bottom: 125px;
 }
 
 // 预置前置变量(保证不暴红) 框架进行替换

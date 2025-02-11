@@ -36,6 +36,16 @@ export default {
       this.currentPlayIndex = 0;
     });
   },
+  updated() {
+    this.$nextTick(() => {
+      try {
+        var container = document.getElementById('lyrics-container');
+        var itemGroup = document.getElementById('lyrics-item-group');
+        itemGroup.style.transform = `translateY(${container.offsetHeight / 2}px)`;
+      } catch (e) {
+      }
+    });
+  },
   data: () => ({
     visible: false,
     showMusicList: false,
@@ -141,8 +151,13 @@ export default {
     },
     getActiveLyricItemStyle() {
       return (currentItem) => {
-        // return currentItem === this.activeLyricItemId ? 'text-high-emphasis' : 'text-medium-emphasis';
-        return currentItem === this.activeLyricItemId ? 'text-primary lyric-content-active' : 'text-medium-emphasis';
+        const content = this.$vuetify.display.smAndDown ? 'lyric-content-mobile' : 'lyric-content';
+        if (currentItem === this.activeLyricItemId) {
+          var classes = 'text-primary';
+          const active = this.$vuetify.display.smAndDown ? 'lyric-content-active-mobile' : 'lyric-content-active';
+          return classes + ` ${content} ${active} `;
+        }
+        return `text-medium-emphasis ${content}`;
       };
     },
     getPlayBtnDisable() {
@@ -542,6 +557,17 @@ export default {
         top: element.scrollTop + e.deltaY * 1.5,
         behavior: 'smooth'
       });
+      this.interruptLyricGroupScroll();
+    },
+
+    /**
+     * 作用于触摸滑动动的事件，用于中断程序滚动事件
+     */
+    onTouchLyricsScroll() {
+      this.interruptLyricGroupScroll();
+    },
+
+    interruptLyricGroupScroll() {
       if (this.interruptTimeoutId != null) clearTimeout(this.interruptTimeoutId);
       this.interruptLyricScroll = true;
       this.interruptTimeoutId = setTimeout(() => {
@@ -647,8 +673,9 @@ export default {
       <v-container
         v-if="showLyricsPanel"
         id="lyrics-parent-container"
-        class="position-relative overflow-x-hidden rounded"
-        :class="{'bg-surface': $vuetify.theme.name !== 'shadowTheme'}">
+        class="position-relative overflow-y-hidden overflow-x-hidden rounded"
+        :class="{'bg-surface': $vuetify.theme.name !== 'shadowTheme'}"
+        fluid>
         <v-overlay
           v-model="showLyricsLoadingOverlay"
           class="align-center justify-center"
@@ -657,89 +684,108 @@ export default {
           <v-progress-circular color="primary" indeterminate/>
           <span class="pl-5 font-weight-bold text-caption">正在加载歌词...</span>
         </v-overlay>
-        <!--    歌词信息开始    -->
-        <v-container class="h-25 d-flex flex-column align-center justify-center bg-transparent">
-          <div class="text-center">
-            <div class="text-h4 text-capitalize">
-              {{ currentParsedLyrics.title }}
-            </div>
-            <div class="pt-5 text-subtitle-2 d-flex align-center flex-column gr-1">
-              <div class="d-inline-flex gc-1">
-                <v-icon>mdi-album</v-icon>
-                {{ currentParsedLyrics.album }}
-              </div>
-              <div class="d-inline-flex gc-1">
-                <v-icon>mdi-microphone</v-icon>
-                {{ currentParsedLyrics.author }}
-              </div>
-              <div class="d-flex gc-5 text-caption">
-                <div class="d-inline-flex gc-1">
-                  <v-icon>mdi-pencil-outline</v-icon>
-                  {{ currentParsedLyrics.by }}
+        <v-row class="h-100 ma-0">
+          <v-col cols="12" class="h-25 text-center" align-self="center">
+            <!--    歌词信息开始    -->
+            <v-row>
+              <v-col cols="12" class="ma-0">
+                <div class="text-capitalize" :class="$vuetify.display.smAndUp ? 'text-h4' : 'text-h5'">
+                  {{ currentParsedLyrics.title }}
                 </div>
-                <div class="d-inline-flex gc-1">
-                  <v-icon>mdi-location-enter</v-icon>
-                  {{ currentParsedLyrics.offset }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </v-container>
-        <!--    歌词信息结束    -->
-
-        <!--    歌词 item 开始    -->
-        <v-container
-          id="lyrics-container"
-          class="h-75 overflow-y-hidden border-t"
-          @wheel.prevent.stop="onWheelLyricsScroll">
-          <v-item-group id="lyrics-item-group" selected-class="text-primary">
-            <template v-if="currentParsedLyrics.data.length !== 0">
-              <template v-for="({id,time,displayTime,content}) in currentParsedLyrics.data">
-                <v-item #default="{ isSelected, selectedClass,toggle }">
-                  <v-hover #default="{isHovering,props}">
-                    <div class="position-relative my-3">
-                      <v-card
-                        v-bind="props"
-                        color="transparent"
-                        class="music-box-lyric-card"
-                        :class="['d-flex align-center justify-center', selectedClass]"
-                        :id="id"
-                        @click="goToCurrentTimeByTime(toggle,time)">
-                        <v-card-item class="lyric-content" :class="getActiveLyricItemStyle(id)" v-html="content"/>
-                      </v-card>
-                      <div
-                        v-bind="props"
-                        class="cursor-pointer position-absolute top-0 bottom-0 right-0">
+              </v-col>
+              <v-col cols="12" class="text-caption ma-0">
+                <v-row>
+                  <v-col cols="6" md="12" class="pa-0 ma-0">
+                    <div class="d-inline-flex gc-1">
+                      <v-icon>mdi-album</v-icon>
+                      {{ currentParsedLyrics.album }}
+                    </div>
+                  </v-col>
+                  <v-col cols="6" md="12" class="pa-0 ma-0">
+                    <div class="d-inline-flex gc-1">
+                      <v-icon>mdi-microphone</v-icon>
+                      {{ currentParsedLyrics.author }}
+                    </div>
+                  </v-col>
+                  <v-col cols="6" md="12" class="pa-0 ma-0">
+                    <div class="d-inline-flex gc-1">
+                      <v-icon>mdi-pencil-outline</v-icon>
+                      {{ currentParsedLyrics.by }}
+                    </div>
+                  </v-col>
+                  <v-col cols="6" md="12" class="pa-0 ma-0">
+                    <div class="d-inline-flex gc-1">
+                      <v-icon>mdi-location-enter</v-icon>
+                      {{ currentParsedLyrics.offset }}
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols="12"
+                 id="lyrics-container"
+                 class="h-75 border-t"
+                 :class="!$vuetify.display.mobile ? 'overflow-y-hidden' : 'overflow-y-scroll'"
+                 @scroll.prevent.stop="onTouchLyricsScroll"
+                 @wheel.prevent.stop="onWheelLyricsScroll">
+            <!--    歌词 item 开始    -->
+            <v-item-group id="lyrics-item-group" selected-class="text-primary">
+              <template v-if="currentParsedLyrics.data.length !== 0">
+                <template v-for="({id,time,displayTime,content}) in currentParsedLyrics.data">
+                  <v-item #default="{ isSelected, selectedClass,toggle }">
+                    <v-hover #default="{isHovering,props}">
+                      <div class="position-relative my-3">
+                        <v-card
+                          v-bind="props"
+                          color="transparent"
+                          class="music-box-lyric-card"
+                          :class="['d-flex align-center justify-center', selectedClass]"
+                          :id="id"
+                          @click="goToCurrentTimeByTime(toggle,time)">
+                          <v-card-item :class="getActiveLyricItemStyle(id)" v-html="content"/>
+                        </v-card>
                         <div
-                          class="d-flex align-center justify-center h-100 text-subtitle-2 gc-1 px-5 text-primary lyric-hover"
-                          v-if="isHovering">
-                          <v-btn
-                            prepend-icon="mdi-play"
-                            variant="text"
-                            :text="removeTheBrackets(displayTime)"
-                            @click="goToCurrentTimeByTime(toggle,time)"/>
+                          v-if="!$vuetify.display.smAndDown"
+                          v-bind="props"
+                          class="cursor-pointer position-absolute top-0 bottom-0 right-0">
+                          <div
+                            class="d-flex align-center justify-center h-100 text-subtitle-2 gc-1 px-5 text-primary lyric-hover"
+                            v-if="isHovering">
+                            <v-btn
+                              prepend-icon="mdi-play"
+                              variant="text"
+                              :text="removeTheBrackets(displayTime)"
+                              @click="goToCurrentTimeByTime(toggle,time)"/>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </v-hover>
-                </v-item>
+                    </v-hover>
+                  </v-item>
+                </template>
               </template>
-            </template>
-            <template v-else>
-              <template v-for="(item) in currentParsedLyrics.other">
-                <v-item>
-                  <v-card
-                    color="transparent"
-                    class="music-box-lyric-card"
-                    :title="item"
-                  />
-                </v-item>
+              <template v-else>
+                <v-overlay
+                  :model-value="true"
+                  class="align-center justify-center"
+                  contained
+                  persistent>
+                  <template v-for="(item) in currentParsedLyrics.other">
+                    <v-item>
+                      <v-card
+                        color="transparent"
+                        class="music-box-lyric-card"
+                        :title="item"
+                      />
+                    </v-item>
+                  </template>
+                </v-overlay>
               </template>
-            </template>
-          </v-item-group>
-        </v-container>
+            </v-item-group>
+            <!--    歌词item结束    -->
+          </v-col>
+        </v-row>
       </v-container>
-      <!--    歌词item结束    -->
     </v-expand-transition>
     <!--  歌词box结束  -->
 
@@ -752,9 +798,10 @@ export default {
           bg-color="rgba(var(--v-theme-surface),.8)"
           height="400px"
           width="300px"
-          activatable>
-          <v-list-subheader sticky :title="`共计${musicList.length}首歌曲~`" />
-          <template  v-for="({id,name,singer},index) in musicList">
+          activatable
+          border>
+          <v-list-subheader sticky :title="`共计${musicList.length}首歌曲~`"/>
+          <template v-for="({id,name,singer},index) in musicList">
             <v-hover #default="{props , isHovering}">
               <v-list-item
                 class="py-2"
@@ -768,7 +815,7 @@ export default {
                 @click="currentPlayIndex = index"
                 link>
                 <template #prepend>
-                  <div class="px-3 ">{{index}}</div>
+                  <div class="px-3 ">{{ index + 1 }}</div>
                 </template>
                 <template #append>
                   <div v-if="isHovering">
@@ -805,7 +852,10 @@ export default {
         striped
         clickable
       />
+
+      <!--  通用布局开始    -->
       <v-list
+        v-if="!$vuetify.display.smAndDown"
         class="overflow-visible"
         bg-color="rgba(var(--v-theme-surface),.9)">
         <v-list-item>
@@ -888,6 +938,101 @@ export default {
           <!--   播放器按钮开始   -->
         </v-list-item>
       </v-list>
+      <!--  通用布局结束    -->
+
+      <!--  手机布局开始    -->
+      <v-list
+        v-else
+        class="overflow-visible"
+        bg-color="rgba(var(--v-theme-surface),.9)">
+        <v-list-item>
+          <!--   音乐名称   -->
+          <v-list-item-title>{{ musicBeingPlayed.name }}</v-list-item-title>
+          <!--   音乐歌唱者   -->
+          <v-list-item-subtitle>{{ musicBeingPlayed.singer }}</v-list-item-subtitle>
+          <!--   播放器按钮开始   -->
+          <template #append>
+            <div class="text-subtitle-2">
+              {{ getFormatCurrentTime }} / {{ getFormatDuration }}
+            </div>
+            <v-divider class="ml-3" color="primary" vertical thickness="1"/>
+            <!--     隐藏 music box 按钮       -->
+            <v-btn
+              icon="mdi-export"
+              variant="text"
+              :ripple="{class: 'text-primary'}"
+              @click="putAwayTheMusicBox"
+            />
+            <!--     歌词按钮       -->
+            <v-btn
+              :loading="lyricsLoading"
+              :icon="getLyricsBtnIconByIsShowLyricsPanel"
+              variant="text"
+              :ripple="{class: 'text-primary'}"
+              @click="changeIsShowLyrics"
+            />
+          </template>
+          <!--   播放器按钮开始   -->
+        </v-list-item>
+        <v-list-item>
+          <template #prepend>
+            <!--      上一首      -->
+            <v-btn
+              icon="mdi-rewind"
+              :ripple="{class: 'text-primary'}"
+              variant="text"
+              @click="playPrevMusic"
+              :disabled="getPlayPrevBtnDisable"
+            />
+            <!--      播放或者暂停      -->
+            <v-btn
+              :icon="getPlayBtnIconByPlayStatus"
+              variant="text"
+              :ripple="{class: 'text-primary'}"
+              @click="changePlayStatus"
+              :disabled="getPlayBtnDisable"
+            />
+            <!--      下一首      -->
+            <v-btn
+              icon="mdi-fast-forward"
+              :ripple="{class: 'text-primary'}"
+              variant="text"
+              @click="playNextMusic"
+              :disabled="getPlayNextBtnDisable"
+            />
+            <v-divider class="ml-3" color="primary" vertical thickness="1"/>
+            <!--      音乐列表      -->
+            <v-btn
+              :icon="getMusicListMenuIconByIsShowMusicList"
+              :ripple="{class: 'text-primary'}"
+              variant="text"
+              @click="changeIsShowMusicList"
+            />
+            <!--     音量条开始       -->
+            <v-slider
+              v-if="showVolumeSlider"
+              v-model="volume"
+              :width="getVolumeSliderWidthByBreakpoint"
+              direction="horizontal"
+              :thumb-label="getFormatVolume"
+              thumb-size="15"
+              track-size="3"
+              hide-details
+              hide-spin-buttons
+              @update:model-value="onSetVolume">
+              <template #prepend>
+                <v-icon class="opacity-100">
+                  {{ getSliderPrependIconByVolume }}
+                </v-icon>
+              </template>
+            </v-slider>
+          </template>
+
+          <!--     音量条结束       -->
+        </v-list-item>
+      </v-list>
+      <!--  手机布局结束    -->
+
     </v-sheet>
     <!--  操作台box结束  -->
   </v-bottom-sheet>
@@ -896,13 +1041,8 @@ export default {
 @import '@/styles/main';
 
 #lyrics-parent-container {
-  height: 100dvh;
+  height: 100vh;
   box-shadow: 0 11px 15px -7px inset rgb(var(--v-theme-primary)) !important;
-}
-
-#lyrics-item-group {
-  transform: translateY(250px);
-  //margin-top: 100px;
 }
 
 .music-box {
@@ -929,12 +1069,22 @@ export default {
     opacity: 1;
   }
 }
+
 .lyric-content {
   transition: 1s;
   transform: scale(.9);
 }
+
 .lyric-content-active {
   transform: scale(1.2);
-  //margin-inline: 50px 0;
+}
+
+.lyric-content-mobile {
+  transition: 1s;
+  transform: scale(.6);
+}
+
+.lyric-content-active-mobile {
+  transform: scale(.8);
 }
 </style>
