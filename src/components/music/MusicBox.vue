@@ -1,5 +1,5 @@
 <script>
-import {mapActions, mapState} from "pinia";
+import {mapActions} from "pinia";
 import {useMusicStore} from "@/stores/music";
 
 export default {
@@ -9,63 +9,72 @@ export default {
       type: Boolean,
       default: false,
     },
-    // musicList: {
-    //   type: Array,
-    //   default: [],
-    // }
-  },
-  setup() {
-    // const {} = useDate();
   },
   created() {
+    const audio = new Audio();
+    audio.preload = "metadata";
+    // 设置默认音量
+    audio.volume = this.deformattingVolume(this.volume);
+    // 设置音乐是否预备回调
+    audio.addEventListener('canplay', this.onMusicCanplayAtAudio);
+    // 设置音乐缓冲回调
+    audio.addEventListener('progress', this.onProgressAtAudio);
+    // 设置时间更新回调
+    audio.addEventListener('timeupdate', this.onTimeUpdateAtAudio);
+    // 设置音乐是否播放完成回调
+    audio.addEventListener('ended', this.onMusicPlayEndedAtAudio);
+    // 设置缓冲的第一帧数据 (特例：防止第一首歌没有timeRangers出现继续播放的奇葩情况)
+    audio.addEventListener('loadeddata', () => {
+      if (this.bufferedProgress === 0 && audio.buffered.length > 0) {
+        this.bufferedProgress = audio.buffered.end(audio.buffered.length - 1) / audio.duration * 100;
+      }
+    })
+    this.audio = audio;
   },
   mounted() {
-    this.$nextTick(() => {
-      const audio = this.$refs["internal-audio"];
-      // 设置是否自动播放
-      // audio.autoplay = this.autoplay;
-      // 设置默认音量
-      audio.volume = this.deformattingVolume(this.volume);
-    });
-    /////
-    // todo 初始化 通过API获取音乐List在 launch函数中做(获取第一页数据即可)
-    /////
     this.loadMusicList().then(value => {
       this.musicList = value;
-      // alert(JSON.stringify(this.musicList));
-      this.currentPlayIndex = 0;
+      if (value.length !== 0) {
+        this.currentPlayIndex = 0;
+      }
     });
   },
-  updated() {
-    this.$nextTick(() => {
-
-    });
+  destroyed() {
+    if (!this.audio.paused) {
+      this.audio.pause();
+    }
+    this.audio = null;
   },
   data: () => ({
+    // 位于内存中的播放器实例
+    audio: null,
+    // 音乐盒子的可见性
     visible: false,
-    showMusicList: false,
+    // 从后端获取的音乐数据
     musicList: [],
+    // 正在播放的音乐位于musicList中的索引位置
     currentPlayIndex: null,
     // 正在播放的音乐
     musicBeingPlayed: {
+      // 数据id
       id: null,
-      // 名称
+      // 歌曲名称
       name: '未知歌曲',
       // 歌唱者
       singer: '未知歌手',
       // 歌词
       lyrics: '',
-      // 音乐地址
+      // 音乐播放地址
       src: null,
     },
-    // 是否显示音量调
-    showVolumeSlider: true,
     // 播放状态
     play: false,
     // 自动播放
     autoplay: false,
     // 音量
-    volume: 50,
+    volume: 80,
+    // 是否显示音量调
+    showVolumeSlider: true,
     // 播放的当前时间
     currentTime: 0,
     // 播放的总时间
@@ -76,10 +85,12 @@ export default {
     playbackProgress: 0,
     // 缓冲进度
     bufferedProgress: 0,
+    // 是否显示歌曲列表
+    showMusicList: false,
+    // 歌词加载遮罩
     showLyricsLoadingOverlay: false,
+    // 歌词面板
     showLyricsPanel: false,
-    // 歌词是否解析过
-    // lyricsParsed: false,
     // 第一次解析该歌词则打开
     lyricsLoading: false,
     // 解析过的歌词作为缓存
@@ -97,21 +108,11 @@ export default {
     },
     // 激活的歌词项的id
     activeLyricItemId: 'lyric-item-0',
+    // 中断歌词渲染相关
     interruptTimeoutId: null,
     interruptLyricScroll: false,
-    // 以下属性可能移除
-    tempLyric: {
-      // 样式中移除的歌词
-      removedLyrics: [],
-    },
-    lyricItem: {
-      old: 0,
-      height: 10,
-      width: 0,
-    },
   }),
   computed: {
-    ...mapState(useMusicStore, ['musics']),
     getVolumeSliderWidthByBreakpoint() {
       return this.$vuetify.display.mobile ? 100 : 150;
     },
@@ -148,9 +149,9 @@ export default {
       return (currentItem) => {
         const content = this.$vuetify.display.smAndDown ? 'lyric-content-mobile' : 'lyric-content';
         if (currentItem === this.activeLyricItemId) {
-          var classes = 'text-primary';
+          const baseClasses = 'text-primary';
           const active = this.$vuetify.display.smAndDown ? 'lyric-content-active-mobile' : 'lyric-content-active';
-          return classes + ` ${content} ${active} `;
+          return `${baseClasses} ${content} ${active}`;
         }
         return `text-medium-emphasis ${content}`;
       };
@@ -171,47 +172,58 @@ export default {
     showMusicBox(value) {
       this.visible = value;
     },
+
     visible(value) {
       this.visible = value;
       this.$emit('visibleChange', value);
     },
-    // 检测play的值来控制 audio是否开始播放还是暂停
+
+    'musicBeingPlayed.src'(src) {
+      this.audio.src = src;
+    },
+
     play() {
-      let audio = this.$refs["internal-audio"];
+      // 检测play的值来控制 audio是否开始播放还是暂停
       if (this.getPlayStatus === 'pause') {
-        audio.pause();
+        this.audio.pause();
         return;
       }
       try {
-        audio.play().then(value => {
+        this.audio.play().then(value => {
           console.log('audio 开始播放 ~', value);
         }).catch(reason => {
-          // alert(reason);
           console.log('audio 播放失败 !', reason);
         });
       } catch (e) {
         console.log(e);
       }
     },
-    //v-progress-linear 生成的是整数
+
+    /**
+     * 控制进度条来控制播放的时间点
+     * @param value
+     */
     playbackProgressPercentage(value) {
-      let audio = this.$refs["internal-audio"];
       value = value / 100;
-      audio.currentTime = value * this.duration;
+      this.audio.currentTime = value * this.duration;
     },
-    // 实际切歌逻辑
+
+    /**
+     * 实际切歌逻辑
+     * @param newIndex
+     * @returns {Promise<void>}
+     */
     async currentPlayIndex(newIndex) {
       this.play = false;
       this.playbackProgress = 0;
       this.bufferedProgress = 0;
-      if (this.showLyricsPanel) this.showLyricsLoadingOverlay = true;
       const {id, name, singer, src_url, lyric_url} = this.musicList.at(newIndex);
       this.musicBeingPlayed = {id, name, singer};
-
       // this.musicBeingPlayed['src'] = await this.loadMusicFileContentAsURL(src_url); 等待完全载入后接入内部地址
       // 懒加载：只给到载入地址不需等待
       this.musicBeingPlayed['src'] = this.getMusicFileHrefFromAssetsByName(`${src_url}`);
-
+      // 如果显示了歌词面板，那么切歌时久应该打开歌词加载遮罩
+      if (this.showLyricsPanel) this.showLyricsLoadingOverlay = true;
       const cache = this.getParsedLyricFromCacheById(id);
       if (cache === null) {
         const lyricOriginContent = lyric_url == null ? '' : await this.loadLyricsFileContentByURL(lyric_url);
@@ -225,32 +237,37 @@ export default {
         });
         return;
       }
-      // todo this.musicBeingPlayed['lyrics'] 需要赋值
       this.currentParsedLyrics = cache;
       this.showLyricsLoadingOverlay = false;
     },
   },
   methods: {
     ...mapActions(useMusicStore, ['loadMusicList', 'loadLyricsFileContentByURL', 'loadMusicFileContentAsURL']),
+
     getMusicFileHrefFromAssetsByName(name) {
       return new URL(`../../assets/music/${name}`, import.meta.url).href;
     },
-    getMusicFileHrefFromAssets(fileName, typeName) {
-      return new URL(`../../assets/music/${fileName}.${typeName}`, import.meta.url).href;
-    },
-    getLyricFileHrefFromAssets(fileName, typeName) {
-      return new URL(`../../assets/music/lyric/${fileName}.${typeName}`, import.meta.url).href;
-    },
-    getMusicMetaHrefFromAssets() {
-      return new URL(`../../assets/music/config/meta.json`, import.meta.url).href;
-    },
 
-    //播放前一首
+    // getMusicFileHrefFromAssets(fileName, typeName) {
+    //   return new URL(`../../assets/music/${fileName}.${typeName}`, import.meta.url).href;
+    // },
+    // getLyricFileHrefFromAssets(fileName, typeName) {
+    //   return new URL(`../../assets/music/lyric/${fileName}.${typeName}`, import.meta.url).href;
+    // },
+    // getMusicMetaHrefFromAssets() {
+    //   return new URL(`../../assets/music/config/meta.json`, import.meta.url).href;
+    // },
+
+    /**
+     * 播放前一首
+     */
     playPrevMusic() {
       this.currentPlayIndex--;
     },
 
-    //播放下一首
+    /**
+     * 播放下一首
+     */
     playNextMusic() {
       this.currentPlayIndex++;
     },
@@ -313,8 +330,7 @@ export default {
      * @param volume
      */
     onSetVolume(volume) {
-      let audio = this.$refs["internal-audio"];
-      audio.volume = this.deformattingVolume(volume);
+      this.audio.volume = this.deformattingVolume(volume);
     },
 
     /**
@@ -351,22 +367,15 @@ export default {
       this.activateTheLyricsStyle_();
     },
 
-    // 下载数据时会触发 progress 事件，如果我们想要显示下载或缓冲进度，这是一个很好的用于做出反应的事件。
-    // -- developer.mozilla.org
     /**
      * 关于Audio的事件回调-正在下载数据
      * @param e
      */
     onProgressAtAudio(e) {
       const audio = e.target;
-      // for (let i = 0; i < audio.buffered.length; i++) {
-      //   const endTime = audio.buffered.end(audio.buffered.length - 1);
-      //   // console.log(endTime,this.duration,audio.duration);
-      //   // 问题：使用this.duration属性并切歌时导致当前音乐的缓冲时间滞留在上一首的缓冲总时间
-      //   // 分析：框架渲染时，优先于onProgressAtAudio，导致数据为旧数据
-      //   this.bufferedProgress = (endTime / audio.duration) * 100;
-      // }
       if (audio.buffered.length > 0) {
+        // 问题：使用this.duration属性并切歌时导致当前音乐的缓冲时间滞留在上一首的缓冲总时间
+        // 分析：框架渲染时，优先于onProgressAtAudio，导致数据为旧数据
         const endTime = audio.buffered.end(audio.buffered.length - 1);
         this.bufferedProgress = (endTime / audio.duration) * 100;
       }
@@ -408,22 +417,6 @@ export default {
         this.showLyricsPanel = !this.showLyricsPanel;
       }
     },
-
-    /*
-      [ti:Try]
-      [ar:Marlisa]
-      [al:Marlisa]
-      [by:]
-      [offset:0]
-      [00:00.00]Try (尝试) - Marlisa
-      [00:23.46]Ever wonder about what he&apos;s doing
-      [00:26.22]
-      [00:27.77]How it all turned to lies
-      [00:29.94]
-      [00:32.67]Sometimes I think that it&apos;s better
-      ...
-      [03:40.38]Gotta get up and try  and try  and try
-   */
 
     /**
      * 将超长字符串解析为数组以供遍历
@@ -510,6 +503,11 @@ export default {
       return result;
     },
 
+    /**
+     * 对初始timeString移除中括号[]
+     * @param timeString
+     * @returns {string}
+     */
     removeTheBrackets(timeString) {
       return timeString.substring(1, timeString.length - 1);
     },
@@ -529,7 +527,7 @@ export default {
       // 获取秒数
       let seconds = parseFloat(timeString.substring(index + 1, timeString.length));
       minutes *= 60;
-      return parseFloat(seconds += minutes).toFixed(2);
+      return parseFloat(`${seconds += minutes}`).toFixed(2);
     },
 
     /**
@@ -553,13 +551,13 @@ export default {
       return 0;
     },
 
-    debounce(func, delay) {
-      let timeout;
-      return function () {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, arguments), delay);
-      };
-    },
+    // debounce(func, delay) {
+    //   let timeout;
+    //   return function () {
+    //     clearTimeout(timeout);
+    //     timeout = setTimeout(() => func.apply(this, arguments), delay);
+    //   };
+    // },
 
     /**
      * 作用于鼠标滚动的事件，用于中断程序滚动事件
@@ -581,6 +579,9 @@ export default {
       this.interruptLyricGroupScroll();
     },
 
+    /**
+     * 公共中断函数，服务于onWheelLyricsScroll , onTouchLyricsScroll
+     */
     interruptLyricGroupScroll() {
       if (this.interruptTimeoutId != null) clearTimeout(this.interruptTimeoutId);
       this.interruptLyricScroll = true;
@@ -590,94 +591,27 @@ export default {
     },
 
     /**
-     * 根据当前时间激活歌词样式
-     * @returns {number}
-     * @deprecated
-     */
-    activateTheLyricsStyle() {
-      // if (!this.lyricsParsed) return;
-      const removedLyrics = this.tempLyric.removedLyrics;
-      // const element = document.getElementById('lyrics-container');
-      //
-      // // element.setAttribute('style','transform: translateY(350px)')
-      // // console.log(element)
-      //
-      // var transform = element.style.transform;
-      //
-      // element.style.transform = `translateY(${this.old -= 10}px)`;
-      // // document.querySelector('#lyrics-parent-container');
-      try {
-        this.currentParsedLyrics.data.forEach(({id, time, content}) => {
-          // console.info('当前歌词项-> ' + `#${id}`);
-          // 需要迭代所有歌词项，要考虑到点击进度条的情况
-          // 如果播放器的时间大于了一句歌词的时间也就是time,则开始激活样式
-          if (content.length === 0) return;
-          if (this.currentTime >= time) {
-            // 当前时间大于该歌词项的时间时，但是歌词id一样就不能操作
-            if (removedLyrics.length > 0) {
-              if (id !== removedLyrics[removedLyrics.length - 1].id) {
-                const lyricElement = document.querySelector(`#${id}`);
-                lyricElement.classList.add('text-primary');
-                // 移除之前的样式
-                if (removedLyrics.length > 0) {
-                  const lastRemovedLyricItem = `#${removedLyrics[removedLyrics.length - 1].id}`;
-                  const beforeLyricItem = document.querySelector(lastRemovedLyricItem);
-                  beforeLyricItem.classList.remove('text-primary');
-                }
-                removedLyrics.push({
-                  id: id,
-                  time: time,
-                });
-              }
-              return;
-            }
-            // 第一次设置歌词样式 (特例)
-            const lyricElement = document.querySelector(`#${id}`);
-            lyricElement.classList.add('text-primary');
-            removedLyrics.push({
-              id: id,
-              time: time,
-            });
-          }
-        });
-      } catch (e) {
-        console.log(e);
-        return -1;
-      }
-      return 0;
-    },
-
-    /**
      * 点击歌词项跳转至对应的时间点
      * @param toggle
      * @param time
      */
     goToCurrentTimeByTime(toggle, time) {
       toggle();
-      let audio = this.$refs["internal-audio"];
-      audio.currentTime = time;
+      this.audio.currentTime = time;
     },
 
+    /**
+     * 歌词面板展开动画后调用
+     */
     itemGroupTranslateY() {
-      var container = document.getElementById('lyrics-container');
-      var itemGroup = document.getElementById('lyrics-item-group');
+      const container = document.getElementById('lyrics-container');
+      const itemGroup = document.getElementById('lyrics-item-group');
       itemGroup.style.transform = `translateY(${container.offsetHeight / 2}px)`;
     },
   },
 }
 </script>
 <template>
-  <!-- audio 不能放在vuetify 组件内部，可能会在未渲染完成时操作dom -->
-  <audio
-    class="d-none"
-    id="internal-audio"
-    ref="internal-audio"
-    :src="musicBeingPlayed.src"
-    @canplay="onMusicCanplayAtAudio"
-    @progress="onProgressAtAudio"
-    @timeupdate="onTimeUpdateAtAudio"
-    @ended="onMusicPlayEndedAtAudio"
-  />
   <v-bottom-sheet
     id="bottom-sheet"
     class="public-transition"
@@ -689,13 +623,13 @@ export default {
     persistent
     no-click-animation>
     <!--  歌词box开始 -->
-    <v-expand-transition>
+    <v-scale-transition>
       <v-container
         v-if="showLyricsPanel"
         id="lyrics-parent-container"
         class="position-relative overflow-y-hidden overflow-x-hidden rounded"
         :class="{'bg-surface': $vuetify.theme.name !== 'shadowTheme'}"
-        @transitionend="itemGroupTranslateY"
+        @transitionrun="itemGroupTranslateY"
         fluid>
         <v-overlay
           v-model="showLyricsLoadingOverlay"
@@ -807,7 +741,7 @@ export default {
           </v-col>
         </v-row>
       </v-container>
-    </v-expand-transition>
+    </v-scale-transition>
     <!--  歌词box结束  -->
 
     <!--  歌曲列表开始  -->
@@ -1064,7 +998,7 @@ export default {
 
 #lyrics-parent-container {
   height: 100vh;
-  box-shadow: 0 11px 15px -7px inset rgb(var(--v-theme-primary)) !important;
+  //box-shadow: 0 11px 15px -7px inset rgb(var(--v-theme-primary)) !important;
 }
 
 .music-box {
