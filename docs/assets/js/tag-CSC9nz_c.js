@@ -1,1 +1,0 @@
-import{_ as a,m as e,u as t,o,c as s}from"./index-DQni56jY.js";const c={name:"tag",mounted(){this.appLaunchOverlay=!1},computed:{...e(t,["appLaunchOverlay"])}};function n(p,r,u,l,m,_){return o(),s("div",null,"tag")}const f=a(c,[["render",n]]);export{f as default};

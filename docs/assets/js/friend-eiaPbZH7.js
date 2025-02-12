@@ -1,0 +1,1 @@
+import{_ as e,m as a,u as t,o as n,c as r}from"./index-2ANzO20e.js";const o={name:"friend",mounted(){this.appLaunchOverlay=!1},computed:{...a(t,["appLaunchOverlay"])}};function s(c,p,u,d,f,i){return n(),r("div",null,"friend")}const m=e(o,[["render",s]]);export{m as default};
