@@ -38,12 +38,7 @@ export default {
   },
   updated() {
     this.$nextTick(() => {
-      try {
-        var container = document.getElementById('lyrics-container');
-        var itemGroup = document.getElementById('lyrics-item-group');
-        itemGroup.style.transform = `translateY(${container.offsetHeight / 2}px)`;
-      } catch (e) {
-      }
+
     });
   },
   data: () => ({
@@ -207,11 +202,16 @@ export default {
     // 实际切歌逻辑
     async currentPlayIndex(newIndex) {
       this.play = false;
+      this.playbackProgress = 0;
       this.bufferedProgress = 0;
       if (this.showLyricsPanel) this.showLyricsLoadingOverlay = true;
       const {id, name, singer, src_url, lyric_url} = this.musicList.at(newIndex);
       this.musicBeingPlayed = {id, name, singer};
-      this.musicBeingPlayed['src'] = await this.loadMusicFileContentAsURL(src_url);
+
+      // this.musicBeingPlayed['src'] = await this.loadMusicFileContentAsURL(src_url); 等待完全载入后接入内部地址
+      // 懒加载：只给到载入地址不需等待
+      this.musicBeingPlayed['src'] = this.getMusicFileHrefFromAssetsByName(`${src_url}`);
+
       const cache = this.getParsedLyricFromCacheById(id);
       if (cache === null) {
         const lyricOriginContent = lyric_url == null ? '' : await this.loadLyricsFileContentByURL(lyric_url);
@@ -232,6 +232,9 @@ export default {
   },
   methods: {
     ...mapActions(useMusicStore, ['loadMusicList', 'loadLyricsFileContentByURL', 'loadMusicFileContentAsURL']),
+    getMusicFileHrefFromAssetsByName(name) {
+      return new URL(`../../assets/music/${name}`, import.meta.url).href;
+    },
     getMusicFileHrefFromAssets(fileName, typeName) {
       return new URL(`../../assets/music/${fileName}.${typeName}`, import.meta.url).href;
     },
@@ -241,16 +244,22 @@ export default {
     getMusicMetaHrefFromAssets() {
       return new URL(`../../assets/music/config/meta.json`, import.meta.url).href;
     },
-    changeIsShowMusicList() {
-      this.showMusicList = !this.showMusicList;
-    },
+
     //播放前一首
     playPrevMusic() {
       this.currentPlayIndex--;
     },
+
     //播放下一首
     playNextMusic() {
       this.currentPlayIndex++;
+    },
+
+    /**
+     * 改变歌曲列表显示状态
+     */
+    changeIsShowMusicList() {
+      this.showMusicList = !this.showMusicList;
     },
 
     /**
@@ -350,11 +359,15 @@ export default {
      */
     onProgressAtAudio(e) {
       const audio = e.target;
-      for (let i = 0; i < audio.buffered.length; i++) {
+      // for (let i = 0; i < audio.buffered.length; i++) {
+      //   const endTime = audio.buffered.end(audio.buffered.length - 1);
+      //   // console.log(endTime,this.duration,audio.duration);
+      //   // 问题：使用this.duration属性并切歌时导致当前音乐的缓冲时间滞留在上一首的缓冲总时间
+      //   // 分析：框架渲染时，优先于onProgressAtAudio，导致数据为旧数据
+      //   this.bufferedProgress = (endTime / audio.duration) * 100;
+      // }
+      if (audio.buffered.length > 0) {
         const endTime = audio.buffered.end(audio.buffered.length - 1);
-        // console.log(endTime,this.duration,audio.duration);
-        // 问题：使用this.duration属性并切歌时导致当前音乐的缓冲时间滞留在上一首的缓冲总时间
-        // 分析：框架渲染时，优先于onProgressAtAudio，导致数据为旧数据
         this.bufferedProgress = (endTime / audio.duration) * 100;
       }
     },
@@ -644,6 +657,12 @@ export default {
       let audio = this.$refs["internal-audio"];
       audio.currentTime = time;
     },
+
+    itemGroupTranslateY() {
+      var container = document.getElementById('lyrics-container');
+      var itemGroup = document.getElementById('lyrics-item-group');
+      itemGroup.style.transform = `translateY(${container.offsetHeight / 2}px)`;
+    },
   },
 }
 </script>
@@ -676,6 +695,7 @@ export default {
         id="lyrics-parent-container"
         class="position-relative overflow-y-hidden overflow-x-hidden rounded"
         :class="{'bg-surface': $vuetify.theme.name !== 'shadowTheme'}"
+        @transitionend="itemGroupTranslateY"
         fluid>
         <v-overlay
           v-model="showLyricsLoadingOverlay"
