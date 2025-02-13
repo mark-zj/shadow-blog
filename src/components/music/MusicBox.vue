@@ -46,6 +46,15 @@ export default {
     this.audio = null;
   },
   data: () => ({
+    version: '1.0',
+    versionTooltip: {
+      text: '麻雀虽小, 但五脏俱全 ~',
+      scrollStrategy: 'close',
+      scrim: true,
+      persistent: false,
+      openOnClick: true,
+      openOnHover: true,
+    },
     // 位于内存中的播放器实例
     audio: null,
     // 音乐盒子的可见性
@@ -178,7 +187,11 @@ export default {
         case 2:
           return 'mdi-sync';
       }
-    }
+    },
+    getMusicMediaTypeBeingPlayed() {
+      const src = `${this.musicBeingPlayed.src}`;
+      return src.substring(src.lastIndexOf('.') + 1, src.length);
+    },
   },
   watch: {
     showMusicBox(value) {
@@ -188,7 +201,7 @@ export default {
     visible(value) {
       this.visible = value;
       this.$emit('visibleChange', value);
-      if(!value && this.showMusicList)
+      if (!value && this.showMusicList)
         this.showMusicList = false;
     },
 
@@ -672,6 +685,21 @@ export default {
         :class="{'bg-surface': $vuetify.theme.name !== 'shadowTheme'}"
         @transitionrun="itemGroupTranslateY"
         fluid>
+        <!--    版本标签开始    -->
+        <div class="position-relative">
+          <v-chip
+            class="position-absolute top-0 left-0 cursor-pointer text-caption"
+            :text="`v${version}`"
+            density="compact"
+            variant="text"
+            prepend-icon="mdi-music-box"
+            tile
+            v-tooltip:top="versionTooltip"
+          />
+        </div>
+        <!--    版本标签结束    -->
+
+        <!--    歌词加载遮罩开始    -->
         <v-overlay
           v-model="showLyricsLoadingOverlay"
           class="align-center justify-center"
@@ -680,13 +708,23 @@ export default {
           <v-progress-circular color="primary" indeterminate/>
           <span class="pl-5 font-weight-bold text-caption">正在加载歌词...</span>
         </v-overlay>
+        <!--    歌词加载遮罩结束    -->
+
+        <!--    歌词box主体开始    -->
         <v-row class="h-100 ma-0">
           <v-col cols="12" class="h-25 text-center" align-self="center">
             <!--    歌词信息开始    -->
             <v-row>
               <v-col cols="12" class="ma-0">
                 <div class="text-capitalize" :class="$vuetify.display.smAndUp ? 'text-h4' : 'text-h5'">
-                  {{ currentParsedLyrics.title }}
+                  <span>
+                    {{ currentParsedLyrics.title }}
+                  </span>
+                  <span class="position-relative">
+                    <span class="position-absolute top-0 left-0 ml-1 font-weight-thin text-caption text-uppercase">
+                      {{ getMusicMediaTypeBeingPlayed }}
+                    </span>
+                  </span>
                 </div>
               </v-col>
               <v-col cols="12" class="text-caption ma-0">
@@ -780,6 +818,7 @@ export default {
             <!--    歌词item结束    -->
           </v-col>
         </v-row>
+        <!--    歌词box主体结束    -->
       </v-container>
     </v-scale-transition>
     <!--  歌词box结束  -->
