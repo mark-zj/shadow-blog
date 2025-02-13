@@ -78,6 +78,8 @@ export default {
     },
     // 播放状态
     play: false,
+    // 切歌自动播放 用于函数(playPrevMusic playNextMusic)
+    changeMusicAutoplay: true,
     // 自动播放(只与播放方式相关联)
     autoplay: true,
     // 播放方式 0(顺序) 1(随机) 2(循环)
@@ -298,16 +300,21 @@ export default {
      */
     playPrevMusic() {
       this.currentPlayIndex--;
+      if (!this.changeMusicAutoplay) return;
+      this.$nextTick(() => {
+        this.changePlayStatus();
+      });
     },
 
     /**
      * 播放下一首
      */
     playNextMusic() {
-      if(this.currentPlayIndex + 1 < this.musicList.length)
-        this.currentPlayIndex++;
-      else
-        this.currentPlayIndex = 0;
+      this.currentPlayIndex++;
+      if (!this.changeMusicAutoplay) return;
+      this.$nextTick(() => {
+        this.changePlayStatus();
+      });
     },
 
     /**
@@ -329,6 +336,21 @@ export default {
      */
     changePlayStatus() {
       this.play = !this.play;
+    },
+
+    /**
+     * 根据音乐索引切歌并播放
+     * @param index
+     */
+    changePlayCurrentMusic(index) {
+      if (index === this.currentPlayIndex) {
+        this.changePlayStatus();
+        return;
+      }
+      this.currentPlayIndex = index;
+      this.$nextTick(() => {
+        this.changePlayStatus();
+      });
     },
 
     /**
@@ -389,7 +411,10 @@ export default {
         switch (this.playBackMethod) {
           case 0:
             // 顺序播放
-            this.playNextMusic();
+            if (this.currentPlayIndex + 1 < this.musicList.length)
+              this.currentPlayIndex++;
+            else
+              this.currentPlayIndex = 0;
             break;
           case 1:
             // 随机播放
@@ -848,7 +873,7 @@ export default {
                 :subtitle="singer"
                 :active="musicList[currentPlayIndex].id === id"
                 :key="id"
-                @click="currentPlayIndex = index"
+                @click="changePlayCurrentMusic(index)"
                 link>
                 <template #prepend>
                   <div class="px-3 ">{{ index + 1 }}</div>
@@ -860,7 +885,7 @@ export default {
                       class="music-list-item-hover"
                       :icon="this.play && currentPlayIndex === index ? 'mdi-pause' : 'mdi-play'"
                       variant="text"
-                      @click="changePlayStatus"
+                      @click.stop="changePlayCurrentMusic(index)"
                     />
                   </div>
                 </template>
