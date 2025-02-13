@@ -28,7 +28,7 @@ export default {
       if (this.bufferedProgress === 0 && audio.buffered.length > 0) {
         this.bufferedProgress = audio.buffered.end(audio.buffered.length - 1) / audio.duration * 100;
       }
-    })
+    });
     this.audio = audio;
   },
   mounted() {
@@ -380,7 +380,7 @@ export default {
             break;
           case 1:
             // 随机播放
-            const index = parseInt(Math.random() * this.musicList.length, 10);
+            const index = parseInt(`${Math.random() * this.musicList.length}`, 10);
             this.currentPlayIndex = index;
             break;
           case 2:
@@ -885,7 +885,6 @@ export default {
             />
             <!--      播放方式      -->
             <v-btn
-              density="comfortable"
               :icon="getPlayBackMethodIcon"
               :ripple="{class: 'text-primary'}"
               variant="text"
