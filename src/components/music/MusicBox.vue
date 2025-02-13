@@ -69,10 +69,12 @@ export default {
     },
     // 播放状态
     play: false,
-    // 自动播放
-    autoplay: false,
+    // 自动播放(只与播放方式相关联)
+    autoplay: true,
+    // 播放方式 0(顺序) 1(随机) 2(循环)
+    playBackMethod: 0,
     // 音量
-    volume: 80,
+    volume: 50,
     // 是否显示音量调
     showVolumeSlider: true,
     // 播放的当前时间
@@ -167,6 +169,16 @@ export default {
     getPlayNextBtnDisable() {
       return this.musicList.length === 0 || this.currentPlayIndex === this.musicList.length - 1;
     },
+    getPlayBackMethodIcon() {
+      switch (this.playBackMethod) {
+        case 0:
+          return 'mdi-shuffle-disabled';
+        case 1:
+          return 'mdi-shuffle';
+        case 2:
+          return 'mdi-sync';
+      }
+    }
   },
   watch: {
     showMusicBox(value) {
@@ -259,6 +271,14 @@ export default {
     // },
 
     /**
+     * 改变播放方式
+     */
+    changePlayBackMethod() {
+      this.playBackMethod++;
+      if (this.playBackMethod > 2) this.playBackMethod = 0;
+    },
+
+    /**
      * 播放前一首
      */
     playPrevMusic() {
@@ -269,7 +289,10 @@ export default {
      * 播放下一首
      */
     playNextMusic() {
-      this.currentPlayIndex++;
+      if(this.currentPlayIndex + 1 < this.musicList.length)
+        this.currentPlayIndex++;
+      else
+        this.currentPlayIndex = 0;
     },
 
     /**
@@ -346,11 +369,27 @@ export default {
      * 关于Audio的事件回调-音乐已经播放完毕
      */
     onMusicPlayEndedAtAudio() {
-      console.log('音乐播放完成~');
       this.play = false;
-      // todo 同一首歌需要重置之前移除的歌词
-      // const tempLyric = this.tempLyric;
-      // tempLyric.removedLyrics = [];
+      this.$nextTick(() => {
+        switch (this.playBackMethod) {
+          case 0:
+            // 顺序播放
+            this.playNextMusic();
+            break;
+          case 1:
+            // 随机播放
+            const index = parseInt(Math.random() * this.musicList.length, 10);
+            this.currentPlayIndex = index;
+            break;
+          case 2:
+            // 循环播放
+            this.changePlayStatus();
+            return;
+        }
+        this.$nextTick(() => {
+          this.play = this.autoplay;
+        });
+      });
     },
 
     /**
@@ -840,6 +879,14 @@ export default {
               :ripple="{class: 'text-primary'}"
               @click="changeIsShowLyrics"
             />
+            <!--      播放方式      -->
+            <v-btn
+              density="comfortable"
+              :icon="getPlayBackMethodIcon"
+              :ripple="{class: 'text-primary'}"
+              variant="text"
+              @click="changePlayBackMethod"
+            />
             <!--     音量条开始       -->
             <v-slider
               v-if="showVolumeSlider"
@@ -911,61 +958,71 @@ export default {
             <div class="text-subtitle-2">
               {{ getFormatCurrentTime }} / {{ getFormatDuration }}
             </div>
-            <v-divider class="ml-3" color="primary" vertical thickness="1"/>
-            <!--     隐藏 music box 按钮       -->
+            <v-divider class="mx-2" color="primary" vertical thickness="2"/>
+            <!--     歌词按钮     -->
             <v-btn
-              icon="mdi-export"
-              variant="text"
-              :ripple="{class: 'text-primary'}"
-              @click="putAwayTheMusicBox"
-            />
-            <!--     歌词按钮       -->
-            <v-btn
+              density="comfortable"
               :loading="lyricsLoading"
               :icon="getLyricsBtnIconByIsShowLyricsPanel"
               variant="text"
               :ripple="{class: 'text-primary'}"
               @click="changeIsShowLyrics"
             />
-          </template>
-          <!--   播放器按钮开始   -->
-        </v-list-item>
-        <v-list-item>
-          <template #prepend>
-            <!--      上一首      -->
-            <v-btn
-              icon="mdi-rewind"
-              :ripple="{class: 'text-primary'}"
-              variant="text"
-              @click="playPrevMusic"
-              :disabled="getPlayPrevBtnDisable"
-            />
-            <!--      播放或者暂停      -->
-            <v-btn
-              :icon="getPlayBtnIconByPlayStatus"
-              variant="text"
-              :ripple="{class: 'text-primary'}"
-              @click="changePlayStatus"
-              :disabled="getPlayBtnDisable"
-            />
-            <!--      下一首      -->
-            <v-btn
-              icon="mdi-fast-forward"
-              :ripple="{class: 'text-primary'}"
-              variant="text"
-              @click="playNextMusic"
-              :disabled="getPlayNextBtnDisable"
-            />
-            <v-divider class="ml-3" color="primary" vertical thickness="1"/>
             <!--      音乐列表      -->
             <v-btn
+              density="comfortable"
               :icon="getMusicListMenuIconByIsShowMusicList"
               :ripple="{class: 'text-primary'}"
               variant="text"
               @click="changeIsShowMusicList"
             />
+          </template>
+          <!--   播放器按钮开始   -->
+        </v-list-item>
+        <v-list-item class="d-flex flex-row justify-space-around">
+          <template #prepend>
+            <div class="d-flex flex-row justify-space-between">
+              <!--      上一首      -->
+              <v-btn
+                density="default"
+                icon="mdi-rewind"
+                :ripple="{class: 'text-primary'}"
+                variant="text"
+                @click="playPrevMusic"
+                :disabled="getPlayPrevBtnDisable"
+              />
+              <!--      播放或者暂停      -->
+              <v-btn
+                density="default"
+                :icon="getPlayBtnIconByPlayStatus"
+                variant="text"
+                :ripple="{class: 'text-primary'}"
+                @click="changePlayStatus"
+                :disabled="getPlayBtnDisable"
+              />
+              <!--      下一首      -->
+              <v-btn
+                density="default"
+                icon="mdi-fast-forward"
+                :ripple="{class: 'text-primary'}"
+                variant="text"
+                @click="playNextMusic"
+                :disabled="getPlayNextBtnDisable"
+              />
+            </div>
+          </template>
+          <!--      播放方式      -->
+          <v-btn
+            density="comfortable"
+            :icon="getPlayBackMethodIcon"
+            :ripple="{class: 'text-primary'}"
+            variant="outlined"
+            @click="changePlayBackMethod"
+          />
+          <template #append>
             <!--     音量条开始       -->
             <v-slider
+              density="comfortable"
               v-if="showVolumeSlider"
               v-model="volume"
               :width="getVolumeSliderWidthByBreakpoint"
@@ -982,9 +1039,15 @@ export default {
                 </v-icon>
               </template>
             </v-slider>
+            <!--     隐藏 music box 按钮       -->
+            <v-btn
+              density="comfortable"
+              icon="mdi-export"
+              variant="text"
+              :ripple="{class: 'text-primary'}"
+              @click="putAwayTheMusicBox"
+            />
           </template>
-
-          <!--     音量条结束       -->
         </v-list-item>
       </v-list>
       <!--  手机布局结束    -->
