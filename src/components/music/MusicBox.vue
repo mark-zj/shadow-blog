@@ -188,6 +188,8 @@ export default {
     visible(value) {
       this.visible = value;
       this.$emit('visibleChange', value);
+      if(!value && this.showMusicList)
+        this.showMusicList = false;
     },
 
     'musicBeingPlayed.src'(src) {
@@ -785,7 +787,7 @@ export default {
 
     <!--  歌曲列表开始  -->
     <div class="position-relative">
-      <v-expand-x-transition>
+      <v-scroll-x-reverse-transition>
         <v-list
           style="z-index: 2021"
           v-if="showMusicList"
@@ -793,9 +795,12 @@ export default {
           bg-color="rgba(var(--v-theme-surface),.8)"
           height="400px"
           width="300px"
+          lines="one"
+          active-color="primary"
+          nav
           activatable
           border>
-          <v-list-subheader sticky :title="`共计${musicList.length}首歌曲~`"/>
+          <v-list-subheader sticky :title="`当前播放队列：共计${musicList.length}首歌曲~`"/>
           <template v-for="({id,name,singer},index) in musicList">
             <v-hover #default="{props , isHovering}">
               <v-list-item
@@ -804,8 +809,6 @@ export default {
                 :title="name"
                 :subtitle="singer"
                 :active="musicList[currentPlayIndex].id === id"
-                active-color="primary"
-                lines="two"
                 :key="id"
                 @click="currentPlayIndex = index"
                 link>
@@ -815,6 +818,7 @@ export default {
                 <template #append>
                   <div v-if="isHovering">
                     <v-btn
+                      density="compact"
                       class="music-list-item-hover"
                       :icon="this.play && currentPlayIndex === index ? 'mdi-pause' : 'mdi-play'"
                       variant="text"
@@ -826,7 +830,7 @@ export default {
             </v-hover>
           </template>
         </v-list>
-      </v-expand-x-transition>
+      </v-scroll-x-reverse-transition>
     </div>
     <!--  歌曲列表结束  -->
 
