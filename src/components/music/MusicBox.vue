@@ -721,8 +721,7 @@ export default {
           </v-col>
           <v-col cols="12"
                  id="lyrics-container"
-                 class="h-75 border-t"
-                 :class="!$vuetify.display.mobile ? 'overflow-y-hidden' : 'overflow-y-scroll'"
+                 class="h-75 border-t overflow-y-scroll"
                  @scroll.prevent.stop="onTouchLyricsScroll"
                  @wheel.prevent.stop="onWheelLyricsScroll">
             <!--    歌词 item 开始    -->
@@ -1064,7 +1063,10 @@ export default {
 
 #lyrics-parent-container {
   height: 100vh;
-  //box-shadow: 0 11px 15px -7px inset rgb(var(--v-theme-primary)) !important;
+}
+
+#lyrics-container {
+  scrollbar-width: none;
 }
 
 .music-box {
