@@ -854,7 +854,7 @@ export default {
         <v-list
           style="z-index: 2021"
           v-if="showMusicList"
-          class="position-absolute bottom-0 right-0"
+          class="position-absolute bottom-0 right-0 border-b-0 rounded-t music-list"
           bg-color="rgba(var(--v-theme-surface),.8)"
           height="400px"
           width="300px"
@@ -1143,6 +1143,10 @@ export default {
 
 .lyric-hover {
   animation: displayTime ease-in-out .5s;
+}
+
+.music-list {
+  scrollbar-width: none;
 }
 
 .music-list-item-hover {
