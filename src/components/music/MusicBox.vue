@@ -392,7 +392,7 @@ export default {
     onSetVolume(volume) {
       this.audio.volume = this.deformattingVolume(volume);
     },
-
+    ////////////////////////////////////////////////////////////////////////////// audio事件处理 开始
     /**
      * 关于Audio的事件回调-音乐已经预备
      * @param e
@@ -443,7 +443,7 @@ export default {
       // 2.更新播放进度
       this.playbackProgress = (this.currentTime / this.duration) * 100;
       // 3.激活歌词样式
-      this.activateTheLyricsStyle_();
+      this.activateTheLyricsStyle();
     },
 
     /**
@@ -459,7 +459,9 @@ export default {
         this.bufferedProgress = (endTime / audio.duration) * 100;
       }
     },
+    ////////////////////////////////////////////////////////////////////////////// audio事件处理 结束
 
+    ////////////////////////////////////////////////////////////////////////////// 歌词解析 开始
     // 根据当前播放的歌曲的id从缓存中获取解析的歌词
     getParsedLyricFromCacheById(musicId) {
       const index = this.parsedLyricsArray.findIndex((value) => {
@@ -536,6 +538,7 @@ export default {
           const index = timeString.search(':');
           const name = timeString.substring(0, index);
           const val = timeString.substring(index + 1, length);
+          if (val.length === 0) continue;
           switch (name) {
             case 'ti':
               result['title'] = val;
@@ -547,14 +550,14 @@ export default {
               result['album'] = val;
               break;
             case 'by':
-              result['by'] = val.length === 0 ? '未知' : val;
+              result['by'] = val;
               break;
             case 'offset':
               result['offset'] = val;
               break;
             default : {
               result['other'] = val;
-              console.info('无法转换的格式，可能是未能考虑到这个格式!');
+              console.warn('无法转换的格式，可能是未能考虑到这个格式!');
             }
           }
           continue;
@@ -608,19 +611,20 @@ export default {
       minutes *= 60;
       return parseFloat(`${seconds += minutes}`).toFixed(2);
     },
+    ////////////////////////////////////////////////////////////////////////////// 歌词解析 结束
 
     /**
      * 根据当前时间获取应该激活歌词样式的歌词项的id
      * @returns {number}
      */
-    async activateTheLyricsStyle_() {
+    async activateTheLyricsStyle() {
       try {
         this.currentParsedLyrics.data.forEach(({id, time}) => {
           if (this.currentTime >= time) {
             this.activeLyricItemId = id;
             if (this.interruptLyricScroll) return;
-            const element = document.getElementById(id);
-            element.scrollIntoView({behavior: "smooth", block: 'center'});
+            const lyricItemElement = document.getElementById(id);
+            lyricItemElement.scrollIntoView({behavior: "smooth", block: 'center'});
           }
         });
       } catch (e) {
@@ -726,7 +730,7 @@ export default {
         <!--    歌词加载遮罩结束    -->
 
         <!--    歌词box主体开始    -->
-        <v-row class="h-100 ma-0">
+        <v-row class="h-100">
           <v-col cols="12" class="h-25 text-center" align-self="center">
             <!--    歌词信息开始    -->
             <v-row>
