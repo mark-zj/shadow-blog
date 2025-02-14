@@ -701,21 +701,20 @@ export default {
       <v-container
         v-if="showLyricsPanel"
         id="lyrics-parent-container"
-        class="position-relative overflow-y-hidden overflow-x-hidden rounded"
+        class="position-relative overflow-y-hidden overflow-x-hidden rounded-t"
         :class="{'bg-surface': $vuetify.theme.name !== 'shadowTheme'}"
         fluid>
         <!--    版本标签开始    -->
-        <div class="position-relative">
-          <v-chip
-            class="position-absolute top-0 left-0 cursor-pointer text-caption"
-            :text="`v${version}`"
-            density="compact"
-            variant="text"
-            prepend-icon="mdi-music-box"
-            tile
-            v-tooltip:top="versionTooltip"
-          />
-        </div>
+        <v-chip
+          size="x-small"
+          class="position-absolute top-0 left-0 cursor-pointer font-italic"
+          :text="`v${version}`"
+          density="compact"
+          variant="text"
+          prepend-icon="mdi-music-box"
+          tile
+          v-tooltip:top="versionTooltip"
+        />
         <!--    版本标签结束    -->
 
         <!--    歌词加载遮罩开始    -->
@@ -736,7 +735,7 @@ export default {
             <v-row>
               <v-col cols="12" class="ma-0">
                 <div class="text-capitalize" :class="$vuetify.display.smAndUp ? 'text-h4' : 'text-h5'">
-                  <span>
+                  <span class="text-decoration-underline">
                     {{ currentParsedLyrics.title }}
                   </span>
                   <span class="position-relative">
