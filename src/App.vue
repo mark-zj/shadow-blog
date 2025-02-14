@@ -66,7 +66,7 @@ export default {
     },
     showSearchBox: false,
     showDrawer: false,
-    showMusicBox: false,
+    showMusicBox: true,
     items: Array.from({length: 50}, (k, v) => v + 1),
   }),
   computed: {
