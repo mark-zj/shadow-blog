@@ -678,15 +678,6 @@ export default {
       toggle();
       this.audio.currentTime = time;
     },
-
-    /**
-     * 歌词面板展开动画后调用
-     */
-    itemGroupTranslateY() {
-      const container = document.getElementById('lyrics-container');
-      const itemGroup = document.getElementById('lyrics-item-group');
-      itemGroup.style.transform = `translateY(${container.offsetHeight / 2}px)`;
-    },
   },
 }
 </script>
@@ -708,7 +699,6 @@ export default {
         id="lyrics-parent-container"
         class="position-relative overflow-y-hidden overflow-x-hidden rounded"
         :class="{'bg-surface': $vuetify.theme.name !== 'shadowTheme'}"
-        @transitionrun="itemGroupTranslateY"
         fluid>
         <!--    版本标签开始    -->
         <div class="position-relative">
@@ -788,7 +778,10 @@ export default {
                  @scroll.prevent.stop="onTouchLyricsScroll"
                  @wheel.prevent.stop="onWheelLyricsScroll">
             <!--    歌词 item 开始    -->
-            <v-item-group id="lyrics-item-group" selected-class="text-primary">
+            <v-item-group
+              id="lyrics-item-group"
+              :class="{'h-100 d-flex align-center justify-center':currentParsedLyrics.data.length === 0}"
+              selected-class="text-primary">
               <template v-if="currentParsedLyrics.data.length !== 0">
                 <template v-for="({id,time,displayTime,content}) in currentParsedLyrics.data">
                   <v-item #default="{ isSelected, selectedClass,toggle }">
@@ -823,21 +816,15 @@ export default {
                 </template>
               </template>
               <template v-else>
-                <v-overlay
-                  :model-value="true"
-                  class="align-center justify-center"
-                  contained
-                  persistent>
-                  <template v-for="(item) in currentParsedLyrics.other">
-                    <v-item>
-                      <v-card
-                        color="transparent"
-                        class="music-box-lyric-card"
-                        :title="item"
-                      />
-                    </v-item>
-                  </template>
-                </v-overlay>
+                <template v-for="(item) in currentParsedLyrics.other">
+                  <v-item>
+                    <v-card
+                      color="transparent"
+                      class="music-box-lyric-card d-flex align-center justify-center"
+                      :title="item"
+                    />
+                  </v-item>
+                </template>
               </template>
             </v-item-group>
             <!--    歌词item结束    -->
