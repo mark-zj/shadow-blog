@@ -7,7 +7,7 @@ export default {
   props: {
     showMusicBox: {
       type: Boolean,
-      default: false,
+      default: true,
     },
   },
   created() {
@@ -58,7 +58,7 @@ export default {
     // 位于内存中的播放器实例
     audio: null,
     // 音乐盒子的可见性
-    visible: false,
+    visible: true,
     // 从后端获取的音乐数据
     musicList: [],
     // 正在播放的音乐位于musicList中的索引位置
