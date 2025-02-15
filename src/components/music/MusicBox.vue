@@ -78,6 +78,8 @@ export default {
     },
     // 播放状态
     play: false,
+    // 手动切换歌曲时，根据当前播放状态自动是否直接播放
+    changeMusicAutoplayByPlayStatus: true,
     // 切歌自动播放 用于函数(playPrevMusic playNextMusic)
     changeMusicAutoplay: true,
     // 自动播放(只与播放方式相关联)
@@ -301,6 +303,7 @@ export default {
     playPrevMusic() {
       this.currentPlayIndex--;
       if (!this.changeMusicAutoplay) return;
+      if(this.changeMusicAutoplayByPlayStatus && !this.play) return;
       this.$nextTick(() => {
         this.changePlayStatus();
       });
@@ -312,6 +315,7 @@ export default {
     playNextMusic() {
       this.currentPlayIndex++;
       if (!this.changeMusicAutoplay) return;
+      if(this.changeMusicAutoplayByPlayStatus && !this.play) return;
       this.$nextTick(() => {
         this.changePlayStatus();
       });
@@ -352,6 +356,7 @@ export default {
         return;
       }
       this.currentPlayIndex = index;
+      if(this.changeMusicAutoplayByPlayStatus && !this.play) return;
       this.$nextTick(() => {
         this.changePlayStatus();
       });
