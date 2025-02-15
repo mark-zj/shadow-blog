@@ -792,7 +792,7 @@ export default {
                           :class="['d-flex align-center justify-center', selectedClass]"
                           :id="id"
                           @click="goToCurrentTimeByTime(toggle,time)">
-                          <v-card-item :class="getActiveLyricItemStyle(id)" v-html="content"/>
+                          <v-card-item class="font-weight-bold" :class="getActiveLyricItemStyle(id)" v-html="content"/>
                         </v-card>
                         <div
                           v-if="!$vuetify.display.smAndDown"
