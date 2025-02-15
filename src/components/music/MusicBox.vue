@@ -618,20 +618,15 @@ export default {
      * @returns {number}
      */
     async activateTheLyricsStyle() {
-      try {
-        this.currentParsedLyrics.data.forEach(({id, time}) => {
-          if (this.currentTime >= time) {
-            this.activeLyricItemId = id;
-            if (this.interruptLyricScroll) return;
-            const lyricItemElement = document.getElementById(id);
-            lyricItemElement.scrollIntoView({behavior: "smooth", block: 'center'});
-          }
-        });
-      } catch (e) {
-        // console.log(e);
-        return -1;
-      }
-      return 0;
+      if (!this.showLyricsPanel) return;
+      this.currentParsedLyrics.data.forEach(({id, time}) => {
+        if (this.currentTime >= time) {
+          this.activeLyricItemId = id;
+          if (this.interruptLyricScroll) return;
+          const lyricItemElement = document.getElementById(id);
+          lyricItemElement.scrollIntoView({behavior: "smooth", block: 'center'});
+        }
+      });
     },
 
     // debounce(func, delay) {
