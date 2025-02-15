@@ -848,7 +848,11 @@ export default {
           nav
           activatable
           border>
-          <v-list-subheader sticky :title="`当前播放队列：共计${musicList.length}首歌曲~`"/>
+          <v-list-subheader
+            class="rounded"
+            sticky>
+            当前播放队列：共计<span class="text-primary">{{musicList.length}}</span>首歌曲~
+          </v-list-subheader>
           <template v-for="({id,name,singer},index) in musicList">
             <v-hover #default="{props , isHovering}">
               <v-list-item
@@ -856,12 +860,19 @@ export default {
                 v-bind="props"
                 :title="name"
                 :subtitle="singer"
-                :active="musicList[currentPlayIndex].id === id"
+                :active="currentPlayIndex === index"
                 :key="id"
                 @click="changePlayCurrentMusic(index)"
                 link>
                 <template #prepend>
-                  <div class="px-3 ">{{ index + 1 }}</div>
+                  <div class="px-3">
+                    <v-scroll-x-transition hide-on-leave>
+                      <div v-if="currentPlayIndex === index">
+                        <v-icon size="small" icon="mdi-music-note" />
+                      </div>
+                      <div v-else>{{ index + 1 }}</div>
+                    </v-scroll-x-transition>
+                  </div>
                 </template>
                 <template #append>
                   <div v-if="isHovering">
