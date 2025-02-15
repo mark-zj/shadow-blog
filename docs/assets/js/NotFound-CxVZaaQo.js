@@ -1,1 +1,0 @@
-import{_ as e,m as a,u as t,o,c as n}from"./index-2ANzO20e.js";const s={name:"NotFound",mounted(){this.appLaunchOverlay=!1},computed:{...a(t,["appLaunchOverlay"])}};function c(p,r,u,l,d,m){return o(),n("div",null," 访问的页面不存在 ~ ")}const f=e(s,[["render",c]]);export{f as default};
