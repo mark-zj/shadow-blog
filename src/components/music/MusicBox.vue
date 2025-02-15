@@ -322,6 +322,10 @@ export default {
      */
     changeIsShowMusicList() {
       this.showMusicList = !this.showMusicList;
+      if(!this.showMusicList) return;
+      this.$nextTick(() => {
+        this.scrollByLocation();
+      });
     },
 
     /**
@@ -677,6 +681,15 @@ export default {
       toggle();
       this.audio.currentTime = time;
     },
+
+    /**
+     * 根据位置定位并滚动
+     */
+    scrollByLocation() {
+      const currentMusic = this.musicList[this.currentPlayIndex];
+      const musicElement = document.getElementById(`music-item-${currentMusic.id}`);
+      musicElement.scrollIntoView({behavior: "instant", block: 'center'});
+    },
   },
 }
 </script>
@@ -852,10 +865,19 @@ export default {
             class="rounded"
             sticky>
             当前播放队列：共计<span class="text-primary">{{musicList.length}}</span>首歌曲~
+            <div class="position-absolute top-0 bottom-0 right-0 d-flex align-center justify-center">
+              <v-btn
+                 icon="mdi-crosshairs-gps"
+                 variant="flat"
+                 density="comfortable"
+                 @click.stop="scrollByLocation"
+              />
+            </div>
           </v-list-subheader>
           <template v-for="({id,name,singer},index) in musicList">
             <v-hover #default="{props , isHovering}">
               <v-list-item
+                :id="`music-item-${id}`"
                 class="py-2"
                 v-bind="props"
                 :title="name"
